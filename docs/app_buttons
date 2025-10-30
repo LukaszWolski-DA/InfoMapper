@@ -1,0 +1,17 @@
+Buttons w aplikacji InfoMapper
+1. Przyciski Add, Expand, Collapse, Table, Details - przyciski akcji, dodania
+Format odniesienia:
+<button class="text-xs px-2 py-0.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">Add</button>
+
+2. Przycski Delete, Remove, etc.
+<button class="text-xs px-2 py-0.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">Delete</button>
+
+3. Przycski Save
+<button class="text-xs px-2 py-0.5 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">Save</button>
+
+3. Przycski Cancel
+<button class="text-xs px-2 py-0.5 bg-white-500 text-black rounded hover:bg-white-600 transition-colors">Cancel</button>
+
+4. Collapse / Uncollapse
+<button class="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-2 py-1 rounded transition-colors" title="Collapse">▼</button>
+<button class="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-2 py-1 rounded transition-colors" title="Expand">▶</button>

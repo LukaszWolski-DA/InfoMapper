@@ -1,0 +1,6 @@
+1. Filtr
+Smart (OR / AND / LIKE) + zatrzymuje elementy podrzędne
+
+2. Drzewa - ujednolićić look and feel
+
+3. Dodawanie kluczy obcych po relacji (dodaje się sam - w mode "Read only" na podstawie kierunku asocjacji)

@@ -1,0 +1,48 @@
+{
+  "systems": [
+    { "id": "sys_hr_001", "name": "HR" }
+  ],
+  "databases": [
+    { "id": "db_hr_001", "systemId": "sys_hr_001", "name": "hrdta" }
+  ],
+  "schemas": [
+    { "id": "sch_hr_001", "databaseId": "db_hr_001", "name": "dbo" }
+  ],
+  "objects": [
+    {
+      "id": "obj_hr_001",
+      "schemaId": "sch_hr_001",
+      "name": "employee_t",
+      "objectType": "table",
+      "rowCount": 15420,
+      "comment": "Employee master data",
+      "columns": [
+        {
+          "id": "col_hr_001",
+          "objectId": "obj_hr_001",
+          "name": "empl_id",
+          "dataType": { "base": "numeric", "precision": 10, "scale": 0 },
+          "nullable": false,
+          "isPrimaryKey": true,
+          "comment": "Employee ID - Primary Key"
+        },
+        {
+          "id": "col_hr_002",
+          "objectId": "obj_hr_001",
+          "name": "empl_first_name",
+          "dataType": { "base": "varchar", "length": 50 },
+          "nullable": false,
+          "comment": "Employee first name"
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+
+

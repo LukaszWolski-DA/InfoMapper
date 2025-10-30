@@ -1,0 +1,47 @@
+## Drzewa – style i formaty (Object, Model)
+
+### Wspólne założenia
+- Fonty:
+  - Koncept: 12px
+  - Encja: 12px (nazwa bold)
+  - Atrybut: 10px (pomocnicza linia) + 12px (nazwa w Object)
+- Collapse/Expand: przyciski „▶/▼” w stylu @app_buttons (text-xs, szary, hover bez obwódek).
+- Przyciski panelowe (Poziom 3): Expand current only / Expand all / Collapse all – niebieskie wg @app_buttons.
+- Checkboxy (Poziom 2): Has PK, Has PII, Only issues, Hide panel – ten sam komponent i logika.
+- Panel lewy: domyślnie 340 px, resize (220–560 px), stan w localStorage.
+
+### Object – szczegóły
+- Koncept:
+  - Tło: kolor konceptu z lekką przezroczystością (hex + alpha `26`).
+  - Wyrównanie pionowe: wyśrodkowane (items-center), brak underline na hover.
+  - Separator: usunięty (bez `border-b`).
+  - Prawa strona: przycisk collapse/expand „▶/▼”, menu „…”.
+- Encja:
+  - Wiersz: bez hover‑tła i bez focus ring; pozostawione tylko DnD.
+  - Nazwa: 12px, bold; stereotype po prawej (11px, szary).
+  - Wskaźniki: No PK (czerwony tekst na białym tle), PII (`badge badge--pii`).
+  - Wcięcia: sekcja atrybutów `ml-8`.
+- Atrybut:
+  - Nazwa: 12px, czarna.
+  - Badge: PK/FK/PII, odstęp `gap-1`, grupa od nazwy `ml-2`.
+  - Data type: po prawej, 10px, szary; bez bullets/kropek (list-none; usunięty dekorator kropki).
+  - Brak hover‑tła i focus ring.
+
+### Model – szczegóły
+- Koncept:
+  - Tło: kolor konceptu z przezroczystością; separator (border-b) pozostawiony.
+  - Prawa strona: collapse/expand „▶/▼”.
+- Encja:
+  - Nazwa: 12px, bold; stereotype po prawej (11px, szary).
+  - Wskaźniki: No PK (czerwony tekst na białym), PII (`badge badge--pii`).
+  - Wcięcia: jak w Object; atrybuty zaczynają się dalej niż encja.
+- Atrybut:
+  - Nazwa: 12px (akt. w Model: 12px w linii głównej), dataType: 10px, szary po prawej.
+  - Badge: PK/FK/PII `gap-1`, grupa `ml-2`.
+  - Bez bullets i bez dodatkowych kropek.
+
+### Filtry – logika
+- Has PK: encje z co najmniej jednym atrybutem PK.
+- Has PII: encje z co najmniej jednym atrybutem PII.
+- Only issues: encje bez PK.
+- Wyszukiwarka: dopasowuje po nazwie konceptu/encji oraz po nazwach atrybutów; auto‑expand dopasowanych gałęzi.

@@ -1,0 +1,581 @@
+{
+  "systems": [
+    { "id": "sys_hr_001", "name": "HR" },
+    { "id": "sys_crm_001", "name": "CRM" },
+    { "id": "sys_fin_001", "name": "Finance" }
+  ],
+  "databases": [
+    { "id": "db_hr_001", "systemId": "sys_hr_001", "name": "hrdta" },
+    { "id": "db_crm_001", "systemId": "sys_crm_001", "name": "crmprod" },
+    { "id": "db_fin_001", "systemId": "sys_fin_001", "name": "findata" }
+  ],
+  "schemas": [
+    { "id": "sch_hr_001", "databaseId": "db_hr_001", "name": "dbo" },
+    { "id": "sch_crm_001", "databaseId": "db_crm_001", "name": "sales" },
+    { "id": "sch_crm_002", "databaseId": "db_crm_001", "name": "marketing" },
+    { "id": "sch_fin_001", "databaseId": "db_fin_001", "name": "accounting" },
+    { "id": "sch_fin_002", "databaseId": "db_fin_001", "name": "reporting" }
+  ],
+  "objects": [
+    {
+      "id": "obj_hr_001",
+      "schemaId": "sch_hr_001",
+      "name": "employee_t",
+      "objectType": "table",
+      "rowCount": 15420,
+      "comment": "Employee master data",
+      "columns": [
+        {
+          "id": "col_hr_001",
+          "objectId": "obj_hr_001",
+          "name": "empl_id",
+          "dataType": { "base": "numeric", "precision": 10, "scale": 0 },
+          "nullable": false,
+          "isPrimaryKey": true,
+          "comment": "Employee ID - Primary Key"
+        },
+        {
+          "id": "col_hr_002",
+          "objectId": "obj_hr_001",
+          "name": "empl_first_name",
+          "dataType": { "base": "varchar", "length": 50 },
+          "nullable": false,
+          "comment": "Employee first name"
+        },
+        {
+          "id": "col_hr_003",
+          "objectId": "obj_hr_001",
+          "name": "empl_last_name",
+          "dataType": { "base": "varchar", "length": 50 },
+          "nullable": false,
+          "comment": "Employee last name"
+        },
+        {
+          "id": "col_hr_004",
+          "objectId": "obj_hr_001",
+          "name": "empl_email",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": true,
+          "comment": "Employee email address"
+        },
+        {
+          "id": "col_hr_005",
+          "objectId": "obj_hr_001",
+          "name": "dept_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isForeignKey": true,
+          "comment": "Department ID - Foreign Key"
+        },
+        {
+          "id": "col_hr_006",
+          "objectId": "obj_hr_001",
+          "name": "hire_date",
+          "dataType": { "base": "date" },
+          "nullable": false,
+          "comment": "Date of hire"
+        },
+        {
+          "id": "col_hr_007",
+          "objectId": "obj_hr_001",
+          "name": "salary",
+          "dataType": { "base": "decimal", "precision": 10, "scale": 2 },
+          "nullable": true,
+          "comment": "Annual salary"
+        },
+        {
+          "id": "col_hr_008",
+          "objectId": "obj_hr_001",
+          "name": "is_active",
+          "dataType": { "base": "boolean" },
+          "nullable": false,
+          "defaultValue": "1",
+          "comment": "Active employee flag"
+        }
+      ]
+    },
+    {
+      "id": "obj_hr_002",
+      "schemaId": "sch_hr_001",
+      "name": "department_t",
+      "objectType": "table",
+      "rowCount": 45,
+      "comment": "Department master data",
+      "columns": [
+        {
+          "id": "col_hr_009",
+          "objectId": "obj_hr_002",
+          "name": "dept_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true,
+          "comment": "Department ID - Primary Key"
+        },
+        {
+          "id": "col_hr_010",
+          "objectId": "obj_hr_002",
+          "name": "dept_name",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": false,
+          "comment": "Department name"
+        },
+        {
+          "id": "col_hr_011",
+          "objectId": "obj_hr_002",
+          "name": "dept_manager_id",
+          "dataType": { "base": "numeric", "precision": 10, "scale": 0 },
+          "nullable": true,
+          "isForeignKey": true,
+          "comment": "Department manager employee ID"
+        },
+        {
+          "id": "col_hr_012",
+          "objectId": "obj_hr_002",
+          "name": "created_date",
+          "dataType": { "base": "timestamp" },
+          "nullable": false,
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "comment": "Record creation timestamp"
+        }
+      ]
+    },
+    {
+      "id": "obj_hr_003",
+      "schemaId": "sch_hr_001",
+      "name": "salary_history_t",
+      "objectType": "table",
+      "rowCount": 87320,
+      "comment": "Historical salary changes",
+      "columns": [
+        {
+          "id": "col_hr_013",
+          "objectId": "obj_hr_003",
+          "name": "history_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true,
+          "comment": "History record ID"
+        },
+        {
+          "id": "col_hr_014",
+          "objectId": "obj_hr_003",
+          "name": "empl_id",
+          "dataType": { "base": "numeric", "precision": 10, "scale": 0 },
+          "nullable": false,
+          "isForeignKey": true,
+          "comment": "Employee ID"
+        },
+        {
+          "id": "col_hr_015",
+          "objectId": "obj_hr_003",
+          "name": "effective_date",
+          "dataType": { "base": "date" },
+          "nullable": false,
+          "comment": "Effective date of salary change"
+        },
+        {
+          "id": "col_hr_016",
+          "objectId": "obj_hr_003",
+          "name": "old_salary",
+          "dataType": { "base": "decimal", "precision": 10, "scale": 2 },
+          "nullable": true
+        },
+        {
+          "id": "col_hr_017",
+          "objectId": "obj_hr_003",
+          "name": "new_salary",
+          "dataType": { "base": "decimal", "precision": 10, "scale": 2 },
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "id": "obj_hr_004",
+      "schemaId": "sch_hr_001",
+      "name": "vw_employee_current",
+      "objectType": "view",
+      "comment": "Current active employees view",
+      "columns": [
+        {
+          "id": "col_hr_018",
+          "objectId": "obj_hr_004",
+          "name": "empl_id",
+          "dataType": { "base": "numeric", "precision": 10, "scale": 0 },
+          "nullable": false
+        },
+        {
+          "id": "col_hr_019",
+          "objectId": "obj_hr_004",
+          "name": "full_name",
+          "dataType": { "base": "varchar", "length": 101 },
+          "nullable": false
+        },
+        {
+          "id": "col_hr_020",
+          "objectId": "obj_hr_004",
+          "name": "dept_name",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "id": "obj_crm_001",
+      "schemaId": "sch_crm_001",
+      "name": "customer_t",
+      "objectType": "table",
+      "rowCount": 234500,
+      "comment": "Customer master table",
+      "columns": [
+        {
+          "id": "col_crm_001",
+          "objectId": "obj_crm_001",
+          "name": "customer_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_crm_002",
+          "objectId": "obj_crm_001",
+          "name": "customer_name",
+          "dataType": { "base": "varchar", "length": 200 },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_003",
+          "objectId": "obj_crm_001",
+          "name": "customer_email",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": true
+        },
+        {
+          "id": "col_crm_004",
+          "objectId": "obj_crm_001",
+          "name": "customer_phone",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": true
+        },
+        {
+          "id": "col_crm_005",
+          "objectId": "obj_crm_001",
+          "name": "registration_date",
+          "dataType": { "base": "date" },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_006",
+          "objectId": "obj_crm_001",
+          "name": "customer_status",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false,
+          "defaultValue": "'ACTIVE'"
+        }
+      ]
+    },
+    {
+      "id": "obj_crm_002",
+      "schemaId": "sch_crm_001",
+      "name": "order_t",
+      "objectType": "table",
+      "rowCount": 1245000,
+      "comment": "Sales orders",
+      "columns": [
+        {
+          "id": "col_crm_007",
+          "objectId": "obj_crm_002",
+          "name": "order_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_crm_008",
+          "objectId": "obj_crm_002",
+          "name": "customer_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isForeignKey": true
+        },
+        {
+          "id": "col_crm_009",
+          "objectId": "obj_crm_002",
+          "name": "order_date",
+          "dataType": { "base": "timestamp" },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_010",
+          "objectId": "obj_crm_002",
+          "name": "order_amount",
+          "dataType": { "base": "decimal", "precision": 12, "scale": 2 },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_011",
+          "objectId": "obj_crm_002",
+          "name": "order_status",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "id": "obj_crm_003",
+      "schemaId": "sch_crm_001",
+      "name": "order_item_t",
+      "objectType": "table",
+      "rowCount": 4567000,
+      "comment": "Order line items",
+      "columns": [
+        {
+          "id": "col_crm_012",
+          "objectId": "obj_crm_003",
+          "name": "item_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_crm_013",
+          "objectId": "obj_crm_003",
+          "name": "order_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isForeignKey": true
+        },
+        {
+          "id": "col_crm_014",
+          "objectId": "obj_crm_003",
+          "name": "product_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isForeignKey": true
+        },
+        {
+          "id": "col_crm_015",
+          "objectId": "obj_crm_003",
+          "name": "quantity",
+          "dataType": { "base": "int" },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_016",
+          "objectId": "obj_crm_003",
+          "name": "unit_price",
+          "dataType": { "base": "decimal", "precision": 10, "scale": 2 },
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "id": "obj_crm_004",
+      "schemaId": "sch_crm_002",
+      "name": "campaign_t",
+      "objectType": "table",
+      "rowCount": 350,
+      "comment": "Marketing campaigns",
+      "columns": [
+        {
+          "id": "col_crm_017",
+          "objectId": "obj_crm_004",
+          "name": "campaign_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_crm_018",
+          "objectId": "obj_crm_004",
+          "name": "campaign_name",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_019",
+          "objectId": "obj_crm_004",
+          "name": "start_date",
+          "dataType": { "base": "date" },
+          "nullable": false
+        },
+        {
+          "id": "col_crm_020",
+          "objectId": "obj_crm_004",
+          "name": "end_date",
+          "dataType": { "base": "date" },
+          "nullable": true
+        },
+        {
+          "id": "col_crm_021",
+          "objectId": "obj_crm_004",
+          "name": "budget",
+          "dataType": { "base": "decimal", "precision": 12, "scale": 2 },
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "id": "obj_fin_001",
+      "schemaId": "sch_fin_001",
+      "name": "account_t",
+      "objectType": "table",
+      "rowCount": 1200,
+      "comment": "Chart of accounts",
+      "columns": [
+        {
+          "id": "col_fin_001",
+          "objectId": "obj_fin_001",
+          "name": "account_id",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_fin_002",
+          "objectId": "obj_fin_001",
+          "name": "account_name",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_003",
+          "objectId": "obj_fin_001",
+          "name": "account_type",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_004",
+          "objectId": "obj_fin_001",
+          "name": "parent_account_id",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": true,
+          "isForeignKey": true
+        }
+      ]
+    },
+    {
+      "id": "obj_fin_002",
+      "schemaId": "sch_fin_001",
+      "name": "transaction_t",
+      "objectType": "table",
+      "rowCount": 8900000,
+      "comment": "Financial transactions",
+      "columns": [
+        {
+          "id": "col_fin_005",
+          "objectId": "obj_fin_002",
+          "name": "transaction_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_fin_006",
+          "objectId": "obj_fin_002",
+          "name": "account_id",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false,
+          "isForeignKey": true
+        },
+        {
+          "id": "col_fin_007",
+          "objectId": "obj_fin_002",
+          "name": "transaction_date",
+          "dataType": { "base": "date" },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_008",
+          "objectId": "obj_fin_002",
+          "name": "amount",
+          "dataType": { "base": "decimal", "precision": 15, "scale": 2 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_009",
+          "objectId": "obj_fin_002",
+          "name": "description",
+          "dataType": { "base": "varchar", "length": 500 },
+          "nullable": true
+        },
+        {
+          "id": "col_fin_010",
+          "objectId": "obj_fin_002",
+          "name": "created_by",
+          "dataType": { "base": "varchar", "length": 50 },
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "id": "obj_fin_003",
+      "schemaId": "sch_fin_001",
+      "name": "vw_monthly_balance",
+      "objectType": "view",
+      "comment": "Monthly account balances",
+      "columns": [
+        {
+          "id": "col_fin_011",
+          "objectId": "obj_fin_003",
+          "name": "account_id",
+          "dataType": { "base": "varchar", "length": 20 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_012",
+          "objectId": "obj_fin_003",
+          "name": "month",
+          "dataType": { "base": "date" },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_013",
+          "objectId": "obj_fin_003",
+          "name": "balance",
+          "dataType": { "base": "decimal", "precision": 15, "scale": 2 },
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "id": "obj_fin_004",
+      "schemaId": "sch_fin_002",
+      "name": "financial_report_t",
+      "objectType": "table",
+      "rowCount": 2400,
+      "comment": "Financial reports metadata",
+      "columns": [
+        {
+          "id": "col_fin_014",
+          "objectId": "obj_fin_004",
+          "name": "report_id",
+          "dataType": { "base": "int" },
+          "nullable": false,
+          "isPrimaryKey": true
+        },
+        {
+          "id": "col_fin_015",
+          "objectId": "obj_fin_004",
+          "name": "report_name",
+          "dataType": { "base": "varchar", "length": 100 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_016",
+          "objectId": "obj_fin_004",
+          "name": "report_type",
+          "dataType": { "base": "varchar", "length": 50 },
+          "nullable": false
+        },
+        {
+          "id": "col_fin_017",
+          "objectId": "obj_fin_004",
+          "name": "created_date",
+          "dataType": { "base": "timestamp" },
+          "nullable": false
+        }
+      ]
+    }
+  ]
+}

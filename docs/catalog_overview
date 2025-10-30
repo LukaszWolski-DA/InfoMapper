@@ -1,0 +1,8 @@
+Karta katalog
+Karta katalog daje użytkownikowi możliwość przygotowania tabeli z pokryciem powiązań pomiędzy koncptami, encjami, atrybutami
+, źródłami (baza danych, schemat, etc.) oraz wymaganiami i relacjami pomiędzy encjami.
+Finalnym efektem jest tabela, w której użytkownik widzi, np. kolumnę Entity, Attribute, Source Database, Source Column.
+Układ działa jako left join (zaczynamy od obiektów wskzancyh po lewej stronie).
+
+Użytkownik sam może zdecydować, które metdane chce dodać i śledzić w tabeli (enja, source database, requirement, etc.)
+Użytkownik może też użyć filtra do pokazania tylko np. Encja = Order lub inncyh dotyczących przygotownych wcześniej artfaktów metdanych.
