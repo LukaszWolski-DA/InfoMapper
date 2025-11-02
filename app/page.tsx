@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { TopNav } from "@/components/top-nav"
 import { Sidebar } from "@/components/sidebar"
 import { DiagramArea } from "@/components/diagram-area"
@@ -197,26 +197,35 @@ export default function InfoMapperPage() {
   const [logicalEntities, setLogicalEntities] = useState<LogicalEntity[]>(getObjectState().logicalEntities)
   const [logicalAttributes, setLogicalAttributes] = useState<LogicalAttribute[]>(getObjectState().logicalAttributes)
 
-  const projectedEntities: Entity[] = projectEntities({ concepts, logicalEntities, logicalAttributes })
+  const projectedEntities: Entity[] = useMemo(
+    () => projectEntities({ concepts, logicalEntities, logicalAttributes }),
+    [concepts, logicalEntities, logicalAttributes]
+  )
 
   // Projekcje dla widoków
-  const mappingProjection = projectMapping({
-    concepts,
-    logicalEntities,
-    logicalAttributes,
-    diagramItems,
-    connections,
-    requirements: storeRequirements,
-    externalSources: importedSources,
-  })
+  const mappingProjection = useMemo(
+    () => projectMapping({
+      concepts,
+      logicalEntities,
+      logicalAttributes,
+      diagramItems,
+      connections,
+      requirements: storeRequirements,
+      externalSources: importedSources,
+    }),
+    [concepts, logicalEntities, logicalAttributes, diagramItems, connections, storeRequirements, importedSources]
+  )
 
-  const modelProjection = projectModel({
-    concepts,
-    logicalEntities,
-    logicalAttributes,
-    diagramItems: modelDiagramItems,
-    relationships: modelRelationships,
-  })
+  const modelProjection = useMemo(
+    () => projectModel({
+      concepts,
+      logicalEntities,
+      logicalAttributes,
+      diagramItems: modelDiagramItems,
+      relationships: modelRelationships,
+    }),
+    [concepts, logicalEntities, logicalAttributes, modelDiagramItems, modelRelationships]
+  )
 
   // Init store from storage and subscribe UI to store changes (Object domain)
   useEffect(() => {

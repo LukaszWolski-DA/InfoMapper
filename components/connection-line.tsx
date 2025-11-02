@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, memo } from "react"
 import type { Connection } from "@/lib/types"
 
 interface ConnectionLineProps {
@@ -9,7 +9,7 @@ interface ConnectionLineProps {
   zoom?: number
 }
 
-export function ConnectionLine({ connection, onDelete, zoom = 1 }: ConnectionLineProps) {
+export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1 }: ConnectionLineProps) {
   const lineRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({
     startX: 0,
@@ -287,4 +287,13 @@ export function ConnectionLine({ connection, onDelete, zoom = 1 }: ConnectionLin
       )}
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // Only re-render if connection or zoom changed
+  return (
+    prevProps.connection.id === nextProps.connection.id &&
+    prevProps.zoom === nextProps.zoom &&
+    // Check if connection endpoints changed
+    prevProps.connection.source.itemId === nextProps.connection.source.itemId &&
+    prevProps.connection.target.itemId === nextProps.connection.target.itemId
+  )
+})

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, memo } from "react"
 import type { Relationship, DiagramItem } from "@/lib/types"
 
 interface RelationshipLineProps {
@@ -16,7 +16,7 @@ interface RelationshipLineProps {
   onRequestEdit?: (relationshipId: string) => void
 }
 
-export function RelationshipLine({ relationship, items, onDelete, zoom = 1, selected = false, onSelect, onUpdateLabel, multiIndex = 0, multiCount = 1, onRequestEdit }: RelationshipLineProps) {
+export const RelationshipLine = memo(function RelationshipLine({ relationship, items, onDelete, zoom = 1, selected = false, onSelect, onUpdateLabel, multiIndex = 0, multiCount = 1, onRequestEdit }: RelationshipLineProps) {
   const [lineCoords, setLineCoords] = useState<{
     x1: number
     y1: number
@@ -402,4 +402,18 @@ export function RelationshipLine({ relationship, items, onDelete, zoom = 1, sele
       )}
     </g>
   )
-}
+}, (prevProps, nextProps) => {
+  // Only re-render if relationship or zoom changed
+  return (
+    prevProps.relationship.id === nextProps.relationship.id &&
+    prevProps.zoom === nextProps.zoom &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.multiIndex === nextProps.multiIndex &&
+    prevProps.multiCount === nextProps.multiCount &&
+    // Check if relationship endpoints changed
+    prevProps.relationship.sourceEntityId === nextProps.relationship.sourceEntityId &&
+    prevProps.relationship.targetEntityId === nextProps.relationship.targetEntityId &&
+    // Check if label changed
+    prevProps.relationship.label === nextProps.relationship.label
+  )
+})

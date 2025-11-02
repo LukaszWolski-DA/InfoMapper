@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, memo } from "react"
 import type { DiagramItem, Connection, Attribute, Entity, Source, Requirement } from "@/lib/types"
 import { genLogicalAttributeId, genConnectionId } from "@/lib/id"
 import { ImButton } from "./ui/im-button"
@@ -51,7 +51,7 @@ const OBJECT_TYPE_COLORS: Record<string, string> = {
   Informative: "bg-gray-50 border-gray-200",
 }
 
-export function DiagramCard({
+export const DiagramCard = memo(function DiagramCard({
   item,
   onHide,
   onUpdatePosition,
@@ -954,4 +954,14 @@ export function DiagramCard({
       </div>
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function - only re-render if these specific props change
+  // Return true if props are equal (don't re-render), false if different (re-render)
+  return (
+    prevProps.item === nextProps.item &&
+    prevProps.connections === nextProps.connections &&
+    prevProps.searchQuery === nextProps.searchQuery &&
+    prevProps.zoom === nextProps.zoom &&
+    prevProps.mode === nextProps.mode
+  )
+})
