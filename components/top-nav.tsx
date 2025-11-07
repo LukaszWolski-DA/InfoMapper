@@ -7,13 +7,9 @@ interface TopNavProps {
 
   const sections = [
     { id: "instructions", label: "Instructions" },
-    { id: "sources", label: "Sources" },
-    { id: "sources_v2", label: "Sources v2" },
-    { id: "object", label: "Object" },
+    { id: "sources_v2", label: "Sources" },
     { id: "object_v2", label: "Object v2" },
-    { id: "model", label: "Model" },
     { id: "model_v2", label: "Model v2" },
-    { id: "requirements", label: "Requirements" },
     { id: "requirements_v2", label: "Requirements v2" },
     { id: "mapping", label: "Mapping" },
     { id: "catalog", label: "Catalog" },

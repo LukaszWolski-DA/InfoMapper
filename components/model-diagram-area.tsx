@@ -291,36 +291,42 @@ export function ModelDiagramArea({
         })}
 
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 40 }}>
-          {relationships.map((relationship) => {
-            const bundle = relationBundleIndex.get(relationship.id)
-            const multiIndex = bundle ? bundle.index : 0
-            const multiCount = bundle ? bundle.count : 1
-            return (
-              <RelationshipLine
-                key={relationship.id}
-                relationship={relationship}
-                items={items}
-                onDelete={(id) => {
-                  if (selectedRelationshipId === id) {
-                    onDeleteRelationship(id)
-                    setSelectedRelationshipId(null)
-                  }
-                }}
-                zoom={zoom}
-                selected={selectedRelationshipId === relationship.id}
-                onSelect={() => setSelectedRelationshipId(relationship.id)}
-                onUpdateLabel={onUpdateRelationshipLabel}
-                multiIndex={multiIndex}
-                multiCount={multiCount}
-                onRequestEdit={(id) => {
-                  if (selectedRelationshipId !== id) return
-                  const rel = relationships.find((r) => r.id === id)
-                  if (!rel) return
-                  onRequestEditRelationship(rel)
-                }}
-              />
-            )
-          })}
+          {relationships
+            .filter((relationship) => {
+              const sourceItem = items.find(it => it.itemId === relationship.sourceEntityId)
+              const targetItem = items.find(it => it.itemId === relationship.targetEntityId)
+              return sourceItem?.hidden === false && targetItem?.hidden === false
+            })
+            .map((relationship) => {
+              const bundle = relationBundleIndex.get(relationship.id)
+              const multiIndex = bundle ? bundle.index : 0
+              const multiCount = bundle ? bundle.count : 1
+              return (
+                <RelationshipLine
+                  key={relationship.id}
+                  relationship={relationship}
+                  items={items}
+                  onDelete={(id) => {
+                    if (selectedRelationshipId === id) {
+                      onDeleteRelationship(id)
+                      setSelectedRelationshipId(null)
+                    }
+                  }}
+                  zoom={zoom}
+                  selected={selectedRelationshipId === relationship.id}
+                  onSelect={() => setSelectedRelationshipId(relationship.id)}
+                  onUpdateLabel={onUpdateRelationshipLabel}
+                  multiIndex={multiIndex}
+                  multiCount={multiCount}
+                  onRequestEdit={(id) => {
+                    if (selectedRelationshipId !== id) return
+                    const rel = relationships.find((r) => r.id === id)
+                    if (!rel) return
+                    onRequestEditRelationship(rel)
+                  }}
+                />
+              )
+            })}
         </svg>
 
         {items.length === 0 && (

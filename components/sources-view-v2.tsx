@@ -154,7 +154,7 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
   return (
     <div className="flex flex-1 overflow-hidden text-sm">
       {isLeftPanelVisible ? (
-        <aside className="bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto" style={{ width: `${leftPanelWidth}px`, maxWidth: '40vw', minWidth: '220px' }}>
+        <aside className="bg-gray-50 border-r border-gray-200 p-4 flex flex-col flex-shrink-0" style={{ width: `${leftPanelWidth}px`, maxWidth: '40vw', minWidth: '220px' }}>
           <SourcesTree data={filteredData} selected={selected} onSelect={setSelected} isLeftPanelVisible={isLeftPanelVisible} onToggleLeftPanelVisible={setIsLeftPanelVisible} />
         </aside>
       ) : (

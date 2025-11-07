@@ -10,6 +10,9 @@ import type { DiagramItem, Connection, Attribute, Entity, Source, Requirement } 
 interface DiagramAreaProps {
   diagramItems: DiagramItem[]
   connections: Connection[]
+  positionUpdateCounter?: number
+  collapseCounter?: number
+  activeView?: string
   onAddItem: (itemId: string, itemType: "entity" | "source" | "requirement", left: number, top: number) => void
   onHideItem: (itemId: string) => void
   onUpdatePosition: (itemId: string, left: number, top: number) => void
@@ -41,6 +44,9 @@ interface DiagramAreaProps {
 export function DiagramArea({
   diagramItems,
   connections,
+  positionUpdateCounter,
+  collapseCounter,
+  activeView,
   onAddItem,
   onHideItem,
   onUpdatePosition,
@@ -235,9 +241,15 @@ export function DiagramArea({
           />
         ))}
 
-        {connections.map((connection) => (
-          <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} />
-        ))}
+        {connections
+          .filter((conn) => {
+            const sourceItem = diagramItems.find(it => it.itemId === conn.source.itemId)
+            const targetItem = diagramItems.find(it => it.itemId === conn.target.itemId)
+            return sourceItem?.hidden === false && targetItem?.hidden === false
+          })
+          .map((connection) => (
+            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} activeView={activeView} />
+          ))}
       </div>
     </div>
   )

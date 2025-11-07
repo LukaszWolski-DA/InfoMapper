@@ -588,6 +588,7 @@ export const DiagramCard = memo(function DiagramCard({
         left: `${item.left}px`,
         top: `${item.top}px`,
         width: `${item.width || 250}px`,
+        zIndex: 10,
       }}
       onMouseDown={handleMouseDown}
       data-item-id={item.itemId}
@@ -962,6 +963,9 @@ export const DiagramCard = memo(function DiagramCard({
     prevProps.connections === nextProps.connections &&
     prevProps.searchQuery === nextProps.searchQuery &&
     prevProps.zoom === nextProps.zoom &&
-    prevProps.mode === nextProps.mode
+    prevProps.mode === nextProps.mode &&
+    prevProps.allEntities === nextProps.allEntities &&
+    prevProps.allSources === nextProps.allSources &&
+    prevProps.allRequirements === nextProps.allRequirements
   )
 })

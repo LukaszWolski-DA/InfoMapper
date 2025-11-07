@@ -5,16 +5,12 @@ import { TopNav } from "@/components/top-nav"
 import { Sidebar } from "@/components/sidebar"
 import { DiagramArea } from "@/components/diagram-area"
 import { DependencyPanel } from "@/components/dependency-panel"
-import { ModelView } from "@/components/model-view"
 import { ModelViewV2 } from "@/components/model-view-v2"
-import { ObjectView } from "@/components/object-view"
 import { ObjectViewV2 } from "@/components/object-view-v2"
 import { InstructionsView } from "@/components/instructions-view"
 import { projectEntities, projectMapping, projectModel } from "@/lib/projections"
-import { SourcesView } from "@/components/sources-view"
 import { SourcesViewV2 } from "@/components/sources-view-v2"
 import { CatalogView } from "@/components/catalog-view"
-import { RequirementsView } from "@/components/requirements-view"
 import { RequirementsViewV2 } from "@/components/requirements-view-v2"
 import type { DiagramItem, Connection, Attribute, Entity, Source, Requirement, Relationship, Concept, LogicalEntity, LogicalAttribute } from "@/lib/types"
 import { z } from "zod"
@@ -57,6 +53,8 @@ import {
 import { getObjectState, initObjectStateFromStorage, setObjectState, subscribe } from "@/lib/store"
 import { genLogicalEntityId, genConceptId, genDiagramItemId, genRequirementId } from "@/lib/id"
 import { normalizeStereotype } from "@/lib/utils"
+import { toast } from "sonner"
+import { handleError, safeLocalStorage } from "@/lib/error-handler"
 
 // Zod schemas for runtime validation of persisted/imported state
 const DiagramItemSchema = z.object({
@@ -160,11 +158,18 @@ function formatTime(date: Date | null) {
 export default function InfoMapperPage() {
   const [activeSection, setActiveSection] = useState("instructions")
 
+  // Track which views have been visited for lazy mounting optimization
+  const [visitedViews, setVisitedViews] = useState<Set<string>>(
+    new Set(['instructions']) // Start with instructions view
+  )
+
   const [modelDiagramItems, setModelDiagramItems] = useState<DiagramItem[]>([])
   const [modelRelationships, setModelRelationships] = useState<Relationship[]>([])
 
   const [diagramItems, setDiagramItems] = useState<DiagramItem[]>(getObjectState().items)
   const [connections, setConnections] = useState<Connection[]>(getObjectState().connections)
+  const [positionUpdateCounter, setPositionUpdateCounter] = useState(0)
+  const [collapseCounter, setCollapseCounter] = useState(0)
   const [entityFilter, setEntityFilter] = useState("")
   const [sourceFilter, setSourceFilter] = useState("")
   const [requirementFilter, setRequirementFilter] = useState("")
@@ -329,7 +334,11 @@ export default function InfoMapperPage() {
 
   const hideItem = (itemId: string) => cmdHideDiagramItem(itemId)
 
-  const updateItemPosition = (itemId: string, left: number, top: number) => cmdUpdateDiagramItemPosition(itemId, left, top)
+  const updateItemPosition = (itemId: string, left: number, top: number) => {
+    cmdUpdateDiagramItemPosition(itemId, left, top)
+    // Increment counter to trigger ConnectionLine updates
+    setPositionUpdateCounter(prev => prev + 1)
+  }
 
   const addConnection = (connection: Connection) => cmdAddConnection(connection)
 
@@ -339,14 +348,41 @@ export default function InfoMapperPage() {
 
   const resetAppData = () => {
     try {
-      localStorage.removeItem("infoMapperStateV1")
-      localStorage.removeItem("infoMapperSourcesV1")
-      localStorage.removeItem("infoMapperRequirementsV1")
-      localStorage.removeItem("objectTreeUIv1")
-    } catch {}
-    try {
-      window.location.reload()
-    } catch {}
+      // Use safe localStorage wrapper
+      const keys = [
+        "infoMapperStateV1",
+        "infoMapperSourcesV1",
+        "infoMapperRequirementsV1",
+        "objectTreeUIv1",
+        "infoMapperUIv1"
+      ]
+
+      let successCount = 0
+      keys.forEach(key => {
+        if (safeLocalStorage.removeItem(key)) {
+          successCount++
+        }
+      })
+
+      if (successCount === keys.length) {
+        toast.success('All data cleared successfully')
+      } else {
+        toast.warning(`Cleared ${successCount} of ${keys.length} storage items`)
+      }
+
+      // Reload page
+      setTimeout(() => {
+        window.location.reload()
+      }, 500) // Small delay so user sees the toast
+
+    } catch (error) {
+      handleError({
+        context: 'ui-interaction',
+        error,
+        action: 'resetAppData',
+        userMessage: 'Failed to reset application data',
+      })
+    }
   }
 
   const buildPayload = () => ({
@@ -462,10 +498,23 @@ export default function InfoMapperPage() {
         if (data.requirements && Array.isArray(data.requirements)) {
           setObjectState(prev => ({ ...prev, requirements: data.requirements as any }))
         }
+        toast.success('Data imported successfully')
       } catch (e) {
-        console.error("Error parsing JSON:", e)
-        alert("Invalid JSON file.")
+        handleError({
+          context: 'import-export',
+          error: e,
+          action: 'importFromJson',
+          userMessage: 'Invalid JSON file. Please check the file format.',
+        })
       }
+    }
+    reader.onerror = () => {
+      handleError({
+        context: 'import-export',
+        error: reader.error,
+        action: 'importFromJson',
+        userMessage: 'Failed to read file',
+      })
     }
     reader.readAsText(file)
   }
@@ -481,7 +530,14 @@ export default function InfoMapperPage() {
     input.click()
   }
 
-  const toggleItemCollapsed = (itemId: string) => cmdToggleDiagramItemCollapsed(itemId)
+  const toggleItemCollapsed = (itemId: string) => {
+    cmdToggleDiagramItemCollapsed(itemId)
+    // Delay counter increment to allow CSS transition to complete
+    setTimeout(() => {
+      setCollapseCounter(prev => prev + 1) // Clears cache in ConnectionLine
+      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
+    }, 50) // Short delay for responsive feel
+  }
 
   const updateItemObjectType = (itemId: string, objectType: string) => cmdUpdateDiagramItemObjectType(itemId, objectType)
 
@@ -615,7 +671,14 @@ export default function InfoMapperPage() {
 
   const updateModelRelationship = (relationshipId: string, updates: Partial<{ label: string; cardinality: "1:1" | "1:N" | "M:N" }>) => cmdUpdateModelRelationship(relationshipId, updates)
 
-  const toggleModelItemCollapsed = (itemId: string) => cmdToggleModelItemCollapsed(itemId)
+  const toggleModelItemCollapsed = (itemId: string) => {
+    cmdToggleModelItemCollapsed(itemId)
+    // Delay counter increment to allow CSS transition to complete
+    setTimeout(() => {
+      setCollapseCounter(prev => prev + 1) // Clears cache in ConnectionLine
+      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
+    }, 50) // Short delay for responsive feel
+  }
 
   const setModelAttributeFilter = (itemId: string, filter: "all" | "mapped" | "unmapped" | "keys") => cmdSetModelItemAttributeFilter(itemId, filter)
 
@@ -650,7 +713,7 @@ export default function InfoMapperPage() {
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
+      const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEY)
       if (!raw) return
       const parsed = PersistedStateSchema.parse(JSON.parse(raw))
       // normalize stereotypes in diagram items on load
@@ -672,7 +735,12 @@ export default function InfoMapperPage() {
         setObjectState(prev => ({ ...prev, requirements: parsed.requirements as any }))
       }
     } catch (e) {
-      console.error("Error loading state from localStorage:", e)
+      handleError({
+        context: 'state-management',
+        error: e,
+        action: 'loadStateFromStorage',
+        userMessage: undefined, // Don't show toast on init - just log
+      })
     }
   }, [])
 
@@ -684,11 +752,18 @@ export default function InfoMapperPage() {
     saveTimerRef.current = window.setTimeout(() => {
       try {
         const payload = buildPayload()
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload))
-        setLastSavedAt(new Date())
+        const success = safeLocalStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload))
+        if (success) {
+          setLastSavedAt(new Date())
+        }
         // Event catalog-state-updated usunięty - CatalogView subskrybuje bezpośrednio store
       } catch (e) {
-        console.error("Error saving state to localStorage:", e)
+        handleError({
+          context: 'state-management',
+          error: e,
+          action: 'autosave',
+          userMessage: 'Failed to save changes automatically',
+        })
       }
     }, 700) // debounce
 
@@ -718,7 +793,7 @@ export default function InfoMapperPage() {
   // Load imported Sources on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("infoMapperSourcesV1")
+      const raw = safeLocalStorage.getItem("infoMapperSourcesV1")
       if (raw) {
         const parsed = SourcesDomainSchema.parse(JSON.parse(raw))
         const sourcesData = parsed as unknown as SourcesDomainData
@@ -726,14 +801,19 @@ export default function InfoMapperPage() {
         setImportedSources(projectSourcesToMapping(sourcesData))
       }
     } catch (e) {
-      console.error("Error loading imported Sources:", e)
+      handleError({
+        context: 'state-management',
+        error: e,
+        action: 'loadImportedSources',
+        userMessage: undefined, // Don't show toast on load - just log
+      })
     }
   }, [])
 
   // Handler do aktualizacji źródeł po imporcie (callback dla SourcesView)
   const handleSourcesDataUpdated = () => {
       try {
-        const raw = localStorage.getItem("infoMapperSourcesV1")
+        const raw = safeLocalStorage.getItem("infoMapperSourcesV1")
         if (raw) {
           const parsed = SourcesDomainSchema.parse(JSON.parse(raw))
           const sourcesData = parsed as unknown as SourcesDomainData
@@ -741,274 +821,285 @@ export default function InfoMapperPage() {
           setImportedSources(projectSourcesToMapping(sourcesData))
         }
       } catch (err) {
-        console.error("Error updating imported Sources:", err)
+        handleError({
+          context: 'state-management',
+          error: err,
+          action: 'handleSourcesDataUpdated',
+          userMessage: 'Failed to update imported sources',
+        })
       }
     }
 
   // Requirements są wczytywane ze store przez subscribe (L181-187)
   // Brak potrzeby osobnego useEffect - requirements są już w globalnym stanie
 
+  // Track visited views for lazy mounting
+  useEffect(() => {
+    setVisitedViews(prev => new Set([...prev, activeSection]))
+    // Force connection position recalculation when returning to mapping view
+    if (activeSection === 'mapping') {
+      setPositionUpdateCounter(prev => prev + 1)
+    }
+  }, [activeSection])
+
   const renderSection = () => {
-    switch (activeSection) {
-      case "instructions":
-        return <InstructionsView />
-      case "sources":
-        return (
-          <SourcesView 
-            data={{ systems: [], databases: [], schemas: [], objects: [] }} 
-            onDataUpdated={handleSourcesDataUpdated}
-          />
-        )
-      case "sources_v2":
-        return (
-          <SourcesViewV2 
-            data={{ systems: [], databases: [], schemas: [], objects: [] }} 
-            onDataUpdated={handleSourcesDataUpdated}
-          />
-        )
-      case "object":
-        return (
-          <ObjectView
-            concepts={concepts}
-            entities={logicalEntities}
-            attributes={logicalAttributes}
-            onCreateConcept={createConcept}
-            onUpdateConcept={updateConcept}
-            onDeleteConcept={deleteConcept}
-            onCreateEntity={createLogicalEntity}
-            onUpdateEntity={updateLogicalEntity}
-            onDeleteEntity={deleteLogicalEntity}
-            onCreateAttribute={createLogicalAttribute}
-            onRestoreAttribute={restoreLogicalAttribute}
-            onUpdateAttribute={updateLogicalAttribute}
-            onDeleteAttribute={deleteLogicalAttribute}
-          />
-        )
-      case "object_v2":
-        return (
-          <ObjectViewV2
-            concepts={concepts}
-            entities={logicalEntities}
-            attributes={logicalAttributes}
-            onCreateConcept={createConcept}
-            onUpdateConcept={updateConcept}
-            onDeleteConcept={deleteConcept}
-            onCreateEntity={createLogicalEntity}
-            onUpdateEntity={updateLogicalEntity}
-            onDeleteEntity={deleteLogicalEntity}
-            onCreateAttribute={createLogicalAttribute}
-            onRestoreAttribute={restoreLogicalAttribute}
-            onUpdateAttribute={updateLogicalAttribute}
-            onDeleteAttribute={deleteLogicalAttribute}
-          />
-        )
-      case "model":
-        return (
-          <ModelView
-            entities={modelProjection.entities}
-            onAddCustomEntity={addCustomEntity}
-            diagramItems={modelProjection.diagramItems}
-            relationships={modelProjection.relationships}
-            onAddItem={addModelItem}
-            onHideItem={hideModelItem}
-            onUpdatePosition={updateModelItemPosition}
-            onUpdateObjectType={updateModelItemObjectType}
-            onUpdateWidth={updateModelItemWidth}
-            onAddRelationship={addModelRelationship}
-            onDeleteRelationship={deleteModelRelationship}
-            onUpdateRelationship={updateModelRelationship}
-            onToggleCollapsed={toggleModelItemCollapsed}
-            onSetAttributeFilter={setModelAttributeFilter}
-            onAddCustomAttribute={addModelCustomAttribute}
-            onUpdateAttribute={updateModelAttribute}
-            onDeleteAttribute={deleteModelAttribute}
-            onUpdateLogicalEntity={updateLogicalEntity}
-            onUpdateLogicalAttribute={updateLogicalAttribute}
-            concepts={concepts}
-            logicalEntitiesRaw={logicalEntities}
-          />
-        )
-      case "model_v2":
-        return (
-          <ModelViewV2
-            entities={modelProjection.entities}
-            onAddCustomEntity={addCustomEntity}
-            diagramItems={modelProjection.diagramItems}
-            relationships={modelProjection.relationships}
-            onAddItem={addModelItem}
-            onHideItem={hideModelItem}
-            onUpdatePosition={updateModelItemPosition}
-            onUpdateObjectType={updateModelItemObjectType}
-            onUpdateWidth={updateModelItemWidth}
-            onAddRelationship={addModelRelationship}
-            onDeleteRelationship={deleteModelRelationship}
-            onUpdateRelationship={updateModelRelationship}
-            onToggleCollapsed={toggleModelItemCollapsed}
-            onSetAttributeFilter={setModelAttributeFilter}
-            onAddCustomAttribute={addModelCustomAttribute}
-            onUpdateAttribute={updateModelAttribute}
-            onDeleteAttribute={deleteModelAttribute}
-            onUpdateLogicalEntity={updateLogicalEntity}
-            onUpdateLogicalAttribute={updateLogicalAttribute}
-            concepts={concepts}
-            logicalEntitiesRaw={logicalEntities}
-            logicalAttributesRaw={logicalAttributes}
-          />
-        )
-      case "requirements":
-        return (
-          <RequirementsView />
-        )
-      case "requirements_v2":
-        return (
-          <RequirementsViewV2 
-            connections={connections}
-            logicalAttributes={logicalAttributes}
-            logicalEntities={logicalEntities}
-            concepts={concepts}
-          />
-        )
-      case "validation":
-        return (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
+    return (
+      <>
+        {/* Instructions View */}
+        {visitedViews.has("instructions") && (
+          <div
+            className={activeSection === "instructions" ? "flex flex-col" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <InstructionsView />
+          </div>
+        )}
+
+        {/* Sources View (v2) */}
+        {visitedViews.has("sources_v2") && (
+          <div
+            className={activeSection === "sources_v2" ? "block" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <SourcesViewV2
+              data={{ systems: [], databases: [], schemas: [], objects: [] }}
+              onDataUpdated={handleSourcesDataUpdated}
+            />
+          </div>
+        )}
+
+        {/* Object View (v2) */}
+        {visitedViews.has("object_v2") && (
+          <div
+            className={activeSection === "object_v2" ? "block" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <ObjectViewV2
+              concepts={concepts}
+              entities={logicalEntities}
+              attributes={logicalAttributes}
+              onCreateConcept={createConcept}
+              onUpdateConcept={updateConcept}
+              onDeleteConcept={deleteConcept}
+              onCreateEntity={createLogicalEntity}
+              onUpdateEntity={updateLogicalEntity}
+              onDeleteEntity={deleteLogicalEntity}
+              onCreateAttribute={createLogicalAttribute}
+              onRestoreAttribute={restoreLogicalAttribute}
+              onUpdateAttribute={updateLogicalAttribute}
+              onDeleteAttribute={deleteLogicalAttribute}
+            />
+          </div>
+        )}
+
+        {/* Model View (v2) */}
+        {visitedViews.has("model_v2") && (
+          <div
+            className={activeSection === "model_v2" ? "block" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <ModelViewV2
+              entities={modelProjection.entities}
+              onAddCustomEntity={addCustomEntity}
+              diagramItems={modelProjection.diagramItems}
+              relationships={modelProjection.relationships}
+              onAddItem={addModelItem}
+              onHideItem={hideModelItem}
+              onUpdatePosition={updateModelItemPosition}
+              onUpdateObjectType={updateModelItemObjectType}
+              onUpdateWidth={updateModelItemWidth}
+              onAddRelationship={addModelRelationship}
+              onDeleteRelationship={deleteModelRelationship}
+              onUpdateRelationship={updateModelRelationship}
+              onToggleCollapsed={toggleModelItemCollapsed}
+              onSetAttributeFilter={setModelAttributeFilter}
+              onAddCustomAttribute={addModelCustomAttribute}
+              onUpdateAttribute={updateModelAttribute}
+              onDeleteAttribute={deleteModelAttribute}
+              onUpdateLogicalEntity={updateLogicalEntity}
+              onUpdateLogicalAttribute={updateLogicalAttribute}
+              concepts={concepts}
+              logicalEntitiesRaw={logicalEntities}
+              logicalAttributesRaw={logicalAttributes}
+            />
+          </div>
+        )}
+
+        {/* Requirements View (v2) */}
+        {visitedViews.has("requirements_v2") && (
+          <div
+            className={activeSection === "requirements_v2" ? "block" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <RequirementsViewV2
+              connections={connections}
+              logicalAttributes={logicalAttributes}
+              logicalEntities={logicalEntities}
+              concepts={concepts}
+            />
+          </div>
+        )}
+
+        {/* Validation View (Placeholder) */}
+        {visitedViews.has("validation") && (
+          <div
+            className={activeSection === "validation" ? "flex-1 flex items-center justify-center bg-gray-50" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">Validation</h2>
               <p className="text-gray-600">Validate mappings and check completeness</p>
               <p className="text-sm text-gray-500 mt-4">Coming soon...</p>
             </div>
           </div>
-        )
-      case "catalog":
-        return (
-          <CatalogView />
-        )
-      case "export":
-        return (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
+        )}
+
+        {/* Catalog View */}
+        {visitedViews.has("catalog") && (
+          <div
+            className={activeSection === "catalog" ? "block" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <CatalogView />
+          </div>
+        )}
+
+        {/* Export View (Placeholder) */}
+        {visitedViews.has("export") && (
+          <div
+            className={activeSection === "export" ? "flex-1 flex items-center justify-center bg-gray-50" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">Export</h2>
               <p className="text-gray-600">Export configurations and generate documentation</p>
               <p className="text-sm text-gray-500 mt-4">Coming soon...</p>
             </div>
           </div>
-        )
-      case "settings":
-        return (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
+        )}
+
+        {/* Settings View (Placeholder) */}
+        {visitedViews.has("settings") && (
+          <div
+            className={activeSection === "settings" ? "flex-1 flex items-center justify-center bg-gray-50" : "hidden"}
+            style={{ height: '100%', width: '100%' }}
+          >
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">Settings</h2>
               <p className="text-gray-600">Application settings and preferences</p>
               <p className="text-sm text-gray-500 mt-4">Coming soon...</p>
             </div>
           </div>
-        )
-      case "mapping":
-      default:
-        return (
-          <>
-            <Sidebar
-              entityFilter={entityFilter}
-              sourceFilter={sourceFilter}
-              requirementFilter={requirementFilter}
-              onEntityFilterChange={setEntityFilter}
-              onSourceFilterChange={setSourceFilter}
-              onRequirementFilterChange={setRequirementFilter}
-              diagramItems={diagramItems}
-              // Entities, sources, requirements z projekcji
-              entities={mappingProjection.entities}
-              sources={mappingProjection.sources}
-              requirements={mappingProjection.requirements}
-              customEntities={mappingProjection.entities}
-              customSources={mappingProjection.sources}
-              customRequirements={mappingProjection.requirements}
-              // Nowe: koncepty dla encji + pełne dane logiczne dla ObjectTree
-              concepts={concepts}
-              logicalEntities={logicalEntities}
-              logicalAttributes={logicalAttributes}
-              // Nowe: pełne dane sources z hierarchią systemów
-              sourcesRawData={sourcesRawData}
-              onAddCustomEntity={addCustomEntity}
-              onAddCustomEntityWithConcept={addCustomEntityWithConcept}
-              onAddCustomSource={addCustomSource}
-              onAddCustomRequirement={addCustomRequirement}
-            />
-            <div className="flex-1 flex flex-col">
-              <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <h1 className="text-xl font-semibold text-gray-900">Mapping</h1>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500">Zapisano: {formatTime(lastSavedAt)}</span>
-                    <div className="flex gap-2">
-                    <button
-                      onClick={exportToJson}
-                      className="im-button im-button--neutral"
-                    >
-                      Export JSON
-                    </button>
-                    <button
-                      onClick={handleImportClick}
-                      className="im-button im-button--neutral"
-                    >
-                      Import JSON
-                    </button>
-                    <button
-                      onClick={clearAllMappings}
-                      className="im-button im-button--danger"
-                    >
-                      Clear All Mappings
-                    </button>
+        )}
+
+        {/* Mapping View (Default - always rendered) */}
+        <div
+          className={activeSection === "mapping" ? "flex flex-1 overflow-hidden" : "hidden"}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <Sidebar
+            entityFilter={entityFilter}
+            sourceFilter={sourceFilter}
+            requirementFilter={requirementFilter}
+            onEntityFilterChange={setEntityFilter}
+            onSourceFilterChange={setSourceFilter}
+            onRequirementFilterChange={setRequirementFilter}
+            diagramItems={diagramItems}
+            entities={mappingProjection.entities}
+            sources={mappingProjection.sources}
+            requirements={mappingProjection.requirements}
+            customEntities={mappingProjection.entities}
+            customSources={mappingProjection.sources}
+            customRequirements={mappingProjection.requirements}
+            concepts={concepts}
+            logicalEntities={logicalEntities}
+            logicalAttributes={logicalAttributes}
+            sourcesRawData={sourcesRawData}
+            onAddCustomEntity={addCustomEntity}
+            onAddCustomEntityWithConcept={addCustomEntityWithConcept}
+            onAddCustomSource={addCustomSource}
+            onAddCustomRequirement={addCustomRequirement}
+          />
+          <div className="flex-1 flex flex-col">
+            <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h1 className="text-xl font-semibold text-gray-900">Mapping</h1>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500">Zapisano: {formatTime(lastSavedAt)}</span>
+                  <div className="flex gap-2">
                   <button
-                    onClick={resetAppData}
+                    onClick={exportToJson}
+                    className="im-button im-button--neutral"
+                  >
+                    Export JSON
+                  </button>
+                  <button
+                    onClick={handleImportClick}
+                    className="im-button im-button--neutral"
+                  >
+                    Import JSON
+                  </button>
+                  <button
+                    onClick={clearAllMappings}
                     className="im-button im-button--danger"
                   >
-                    Reset app data
+                    Clear All Mappings
                   </button>
-                    </div>
+                <button
+                  onClick={resetAppData}
+                  className="im-button im-button--danger"
+                >
+                  Reset app data
+                </button>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  <strong className="text-gray-700">Instructions:</strong> Drag entities, sources, and requirements onto
-                  the diagram. Drag attributes or requirement cards to create mappings. Click an attribute to view
-                  dependencies.
-                  <br />
-                  <strong className="text-gray-700">Colors:</strong> Blue lines = attribute mappings, Purple lines =
-                  requirement mappings
-                </p>
-              </header>
-              <DiagramArea
-                diagramItems={diagramItems}
-                connections={connections}
-                onAddItem={addItemToDiagram}
-                onHideItem={hideItem}
-                onUpdatePosition={updateItemPosition}
-                onAddConnection={addConnection}
-                onDeleteConnection={deleteConnection}
-                searchQuery=""
-                onSelectAttribute={setSelectedAttribute}
-                onToggleCollapsed={toggleItemCollapsed}
-                onUpdateObjectType={updateItemObjectType}
-                onSetAttributeFilter={setAttributeFilter}
-                onUpdateWidth={updateItemWidth}
-                onAddCustomAttribute={addCustomAttribute}
-                onUpdateAttribute={updateAttribute}
-                onDeleteAttribute={deleteAttribute}
-                entities={mappingProjection.entities}
-                customSources={mappingProjection.sources}
-                customRequirements={mappingProjection.requirements}
-              />
-            </div>
-            <DependencyPanel
-              selectedAttribute={selectedAttribute}
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                <strong className="text-gray-700">Instructions:</strong> Drag entities, sources, and requirements onto
+                the diagram. Drag attributes or requirement cards to create mappings. Click an attribute to view
+                dependencies.
+                <br />
+                <strong className="text-gray-700">Colors:</strong> Blue lines = attribute mappings, Purple lines =
+                requirement mappings
+              </p>
+            </header>
+            <DiagramArea
+              diagramItems={diagramItems}
               connections={connections}
-              entities={mappingProjection.entities}
-              sources={mappingProjection.sources}
-              requirements={mappingProjection.requirements}
-              onClose={() => setSelectedAttribute(null)}
+              positionUpdateCounter={positionUpdateCounter}
+              collapseCounter={collapseCounter}
+              activeView={activeSection}
+              onAddItem={addItemToDiagram}
+              onHideItem={hideItem}
+              onUpdatePosition={updateItemPosition}
+              onAddConnection={addConnection}
               onDeleteConnection={deleteConnection}
+              searchQuery=""
+              onSelectAttribute={setSelectedAttribute}
+              onToggleCollapsed={toggleItemCollapsed}
+              onUpdateObjectType={updateItemObjectType}
+              onSetAttributeFilter={setAttributeFilter}
+              onUpdateWidth={updateItemWidth}
+              onAddCustomAttribute={addCustomAttribute}
+              onUpdateAttribute={updateAttribute}
+              onDeleteAttribute={deleteAttribute}
+              entities={mappingProjection.entities}
+              customSources={mappingProjection.sources}
+              customRequirements={mappingProjection.requirements}
             />
-          </>
-        )
-    }
+          </div>
+          <DependencyPanel
+            selectedAttribute={selectedAttribute}
+            connections={connections}
+            entities={mappingProjection.entities}
+            sources={mappingProjection.sources}
+            requirements={mappingProjection.requirements}
+            onClose={() => setSelectedAttribute(null)}
+            onDeleteConnection={deleteConnection}
+          />
+        </div>
+      </>
+    )
   }
 
   return (

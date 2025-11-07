@@ -1,15 +1,33 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback, memo } from "react"
+import { useEffect, useRef, useState, useCallback, memo, useMemo } from "react"
 import type { Connection } from "@/lib/types"
+
+// Throttle utility function to limit how often a function can be called
+function throttle<T extends (...args: any[]) => void>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean
+  return function(this: any, ...args: Parameters<T>) {
+    if (!inThrottle) {
+      func.apply(this, args)
+      inThrottle = true
+      setTimeout(() => inThrottle = false, limit)
+    }
+  }
+}
 
 interface ConnectionLineProps {
   connection: Connection
   onDelete: (connectionId: string) => void
   zoom?: number
+  positionUpdateCounter?: number
+  collapseCounter?: number
+  activeView?: string
 }
 
-export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1 }: ConnectionLineProps) {
+export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1, positionUpdateCounter, collapseCounter, activeView }: ConnectionLineProps) {
   const lineRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({
     startX: 0,
@@ -21,48 +39,79 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
   const [isHovered, setIsHovered] = useState(false)
   const animationFrameRef = useRef<number | undefined>(undefined)
 
+  // Visibility tracking for performance optimization
+  const [isVisible, setIsVisible] = useState(true)
+
+  // Element cache refs to reduce querySelector calls
+  const sourceElRef = useRef<Element | null>(null)
+  const targetElRef = useRef<Element | null>(null)
+  const canvasElRef = useRef<HTMLElement | null>(null)
+
   const updatePosition = useCallback(() => {
-    let sourceEl: Element | null = null
-    let targetEl: Element | null = null
+    // Skip position calculation if not visible
+    if (!isVisible) return
+
+    let sourceEl: Element | null = sourceElRef.current
+    let targetEl: Element | null = targetElRef.current
+    let canvasEl: HTMLElement | null = canvasElRef.current
     let sourceIsCard = false
     let targetIsCard = false
 
-    // Try to find source element
-    if (connection.source.attrId) {
-      // First try to find the attribute
-      sourceEl = document.querySelector(`[data-attr-id="${connection.source.attrId}"]`)
+    // Only query if cache miss or elements changed
+    const needsRefresh = !sourceEl || !targetEl || !canvasEl
 
-      if (!sourceEl) {
-        sourceEl = document.querySelector(`[data-item-id="${connection.source.itemId}"]`)
-        sourceIsCard = true
-      }
-    } else {
-      // Entity/requirement level connection
-      sourceEl = document.querySelector(`[data-item-id="${connection.source.itemId}"]`)
-      sourceIsCard = true
+    // CRITICAL: Query canvas FIRST before source/target to scope element searches to visible canvas only
+    if (needsRefresh || !canvasEl) {
+      const allCanvases = document.querySelectorAll(".mapping-canvas")
+      canvasEl = Array.from(allCanvases).find(el => {
+        const style = window.getComputedStyle(el as HTMLElement)
+        return style.display !== 'none'
+      }) as HTMLElement | null || null
+      canvasElRef.current = canvasEl
     }
 
-    // Try to find target element
-    if (connection.target.attrId) {
-      // First try to find the attribute
-      targetEl = document.querySelector(`[data-attr-id="${connection.target.attrId}"]`)
+    if (!canvasEl) return
 
-      if (!targetEl) {
-        targetEl = document.querySelector(`[data-item-id="${connection.target.itemId}"]`)
+    // Try to find source element (scoped to visible canvas)
+    if (needsRefresh || !sourceEl) {
+      if (connection.source.attrId) {
+        // First try to find the attribute within visible canvas
+        sourceEl = canvasEl.querySelector(`[data-attr-id="${connection.source.attrId}"]`)
+
+        if (!sourceEl) {
+          sourceEl = canvasEl.querySelector(`[data-item-id="${connection.source.itemId}"]`)
+          sourceIsCard = true
+        }
+      } else {
+        // Entity/requirement level connection
+        sourceEl = canvasEl.querySelector(`[data-item-id="${connection.source.itemId}"]`)
+        sourceIsCard = true
+      }
+      sourceElRef.current = sourceEl
+    }
+
+    // Try to find target element (scoped to visible canvas)
+    if (needsRefresh || !targetEl) {
+      if (connection.target.attrId) {
+        // First try to find the attribute within visible canvas
+        targetEl = canvasEl.querySelector(`[data-attr-id="${connection.target.attrId}"]`)
+
+        if (!targetEl) {
+          targetEl = canvasEl.querySelector(`[data-item-id="${connection.target.itemId}"]`)
+          targetIsCard = true
+        }
+      } else {
+        // Entity/requirement level connection
+        targetEl = canvasEl.querySelector(`[data-item-id="${connection.target.itemId}"]`)
         targetIsCard = true
       }
-    } else {
-      // Entity/requirement level connection
-      targetEl = document.querySelector(`[data-item-id="${connection.target.itemId}"]`)
-      targetIsCard = true
+      targetElRef.current = targetEl
     }
 
     if (!sourceEl || !targetEl) return
 
     const sourceRect = sourceEl.getBoundingClientRect()
     const targetRect = targetEl.getBoundingClientRect()
-    const canvasEl = document.querySelector(".mapping-canvas") as HTMLElement | null
-    if (!canvasEl) return
     const canvasRect = canvasEl.getBoundingClientRect()
 
     // Convert to unscaled canvas coordinates (divide by zoom)
@@ -165,33 +214,86 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
     const angle = Math.atan2(endY - startY, endX - startX)
 
     setPosition({ startX, startY, endX, endY, angle })
-  }, [connection.source.attrId, connection.source.itemId, connection.target.attrId, connection.target.itemId, zoom])
+  }, [connection.source.attrId, connection.source.itemId, connection.target.attrId, connection.target.itemId, zoom, isVisible, positionUpdateCounter])
+
+  // Reset cache when connection endpoints change, cards collapse/expand, or view changes
+  useEffect(() => {
+    sourceElRef.current = null
+    targetElRef.current = null
+  }, [connection.source.itemId, connection.target.itemId, collapseCounter, activeView])
+
+  // Reset canvas cache when activeView changes to prevent stale coordinates
+  useEffect(() => {
+    canvasElRef.current = null
+  }, [activeView])
+
+  // Throttled version - max 60fps (16ms)
+  const throttledUpdate = useMemo(
+    () => throttle(() => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      animationFrameRef.current = requestAnimationFrame(updatePosition)
+    }, 16), // 16ms = ~60fps
+    [updatePosition]
+  )
+
+  // Intersection Observer - only update visible connections
+  useEffect(() => {
+    if (!lineRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          setIsVisible(entry.isIntersecting)
+        })
+      },
+      {
+        // Trigger when connection is within viewport + 100px margin
+        rootMargin: '100px',
+        threshold: 0
+      }
+    )
+
+    observer.observe(lineRef.current)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  // Immediate position update on mount to fix initial render
+  useEffect(() => {
+    // Use setTimeout to ensure DOM is fully rendered
+    const timeoutId = setTimeout(() => {
+      updatePosition()
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
+  }, [updatePosition])
 
   useEffect(() => {
-    updatePosition()
-
-    const animate = () => {
-      updatePosition()
-      animationFrameRef.current = requestAnimationFrame(animate)
+    // Only update if visible
+    if (isVisible) {
+      throttledUpdate()
     }
-    animationFrameRef.current = requestAnimationFrame(animate)
 
     const diagramEl = document.querySelector(".mapping-scroll-container")
     if (diagramEl) {
-      diagramEl.addEventListener("scroll", updatePosition)
+      diagramEl.addEventListener("scroll", throttledUpdate)
     }
-    window.addEventListener("resize", updatePosition)
+    window.addEventListener("resize", throttledUpdate)
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
       if (diagramEl) {
-        diagramEl.removeEventListener("scroll", updatePosition)
+        diagramEl.removeEventListener("scroll", throttledUpdate)
       }
-      window.removeEventListener("resize", updatePosition)
+      window.removeEventListener("resize", throttledUpdate)
     }
-  }, [updatePosition])
+  }, [throttledUpdate, isVisible])
 
   const { startX, startY, endX, endY, angle } = position
 
@@ -240,12 +342,17 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
     <div
       ref={lineRef}
       className="absolute pointer-events-none"
-      style={{ left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`, zIndex: 10 }}
+      style={{ left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`, zIndex: 50 }}
     >
-      <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-auto">
+      <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none">
         <defs>
-          <marker id={`arrowhead-${connection.id}`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 8 4 L 0 8 z" fill={strokeColorSolid} opacity="0.7" />
+          {/* Normal state arrowhead */}
+          <marker id={`arrowhead-${connection.id}`} markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={strokeColorSolid} opacity="0.7" />
+          </marker>
+          {/* Hovered state arrowhead */}
+          <marker id={`arrowhead-hover-${connection.id}`} markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={strokeColorSolid} opacity="1" />
           </marker>
           <filter id={`shadow-${connection.id}`}>
             <feDropShadow dx="0" dy="1" stdDeviation="1" floodOpacity="0.1" />
@@ -269,9 +376,9 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
           strokeWidth="1.5"
           fill="none"
           strokeLinecap="round"
-          markerEnd={`url(#arrowhead-${connection.id})`}
+          markerEnd={isHovered ? `url(#arrowhead-hover-${connection.id})` : `url(#arrowhead-${connection.id})`}
           filter={`url(#shadow-${connection.id})`}
-          style={{ transition: "stroke-width 0.2s ease, stroke 0.2s ease", strokeWidth: isHovered ? "2.5" : "1.5", stroke: isHovered ? strokeColorSolid : strokeColor }}
+          style={{ transition: "stroke-width 0.2s ease, stroke 0.2s ease", strokeWidth: isHovered ? "2.5" : "1.5", stroke: isHovered ? strokeColorSolid : strokeColor, pointerEvents: "none" }}
         />
       </svg>
 
@@ -280,6 +387,8 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
           className="absolute bg-white text-gray-400 border border-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium hover:bg-red-50 hover:text-red-600 hover:border-red-300 pointer-events-auto transition-all duration-200 shadow-sm"
           style={{ left: `${midX - left - 12}px`, top: `${midY - top - 12}px` }}
           onClick={() => onDelete(connection.id)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           title="Delete connection"
         >
           ×
@@ -287,13 +396,6 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
       )}
     </div>
   )
-}, (prevProps, nextProps) => {
-  // Only re-render if connection or zoom changed
-  return (
-    prevProps.connection.id === nextProps.connection.id &&
-    prevProps.zoom === nextProps.zoom &&
-    // Check if connection endpoints changed
-    prevProps.connection.source.itemId === nextProps.connection.source.itemId &&
-    prevProps.connection.target.itemId === nextProps.connection.target.itemId
-  )
 })
+// Note: Custom comparison removed to allow re-renders when cards move
+// Default shallow comparison will detect when connection object reference changes

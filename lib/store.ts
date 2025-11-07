@@ -1,4 +1,5 @@
 import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship } from "./types"
+import { handleError, safeLocalStorage, safeJSONParse, safeJSONStringify } from "./error-handler"
 
 type RequirementRow = {
   id: string
@@ -47,7 +48,15 @@ function emit() {
   for (const l of Array.from(listeners)) {
     try {
       l()
-    } catch {}
+    } catch (error) {
+      // Log listener errors but don't stop notifying other listeners
+      handleError({
+        context: 'state-management',
+        error,
+        action: 'emit',
+        userMessage: undefined, // Don't show toast for listener errors
+      })
+    }
   }
 }
 
@@ -58,8 +67,9 @@ function schedulePersist() {
   persistTimer = window.setTimeout(() => {
     try {
       // Merge into existing payload saved by the app (diagramItems, connections, etc.)
-      const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
-      const existing = raw ? JSON.parse(raw) : {}
+      const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEY)
+      const existing = raw ? safeJSONParse(raw, {}, 'state-management') : {}
+
       const next = {
         ...existing,
         concepts: state.concepts,
@@ -71,8 +81,19 @@ function schedulePersist() {
         modelItems: state.modelItems,
         modelRelationships: state.modelRelationships,
       }
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(next))
-    } catch {}
+
+      const serialized = safeJSONStringify(next, 'state-management')
+      if (serialized) {
+        safeLocalStorage.setItem(LOCAL_STORAGE_KEY, serialized)
+      }
+    } catch (error) {
+      handleError({
+        context: 'state-management',
+        error,
+        action: 'schedulePersist',
+        userMessage: 'Failed to save changes to browser storage',
+      })
+    }
   }, 600)
 }
 
@@ -95,9 +116,15 @@ export function subscribe(listener: Listener): () => void {
 
 export function initObjectStateFromStorage(): void {
   try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
+    const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEY)
     if (!raw) return
-    const parsed = JSON.parse(raw)
+
+    const parsed = safeJSONParse<any>(raw, null, 'state-management')
+    if (!parsed) {
+      console.warn('Failed to parse stored state, using empty state')
+      return
+    }
+
     state = {
       concepts: Array.isArray(parsed?.concepts) ? parsed.concepts : [],
       logicalEntities: Array.isArray(parsed?.logicalEntities) ? parsed.logicalEntities : [],
@@ -110,7 +137,15 @@ export function initObjectStateFromStorage(): void {
       version: 1,
     }
     emit()
-  } catch {}
+  } catch (error) {
+    handleError({
+      context: 'state-management',
+      error,
+      action: 'initObjectStateFromStorage',
+      userMessage: undefined, // Don't show toast on init - just log
+    })
+    // Keep default empty state
+  }
 }
 
 

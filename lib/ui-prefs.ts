@@ -1,6 +1,8 @@
 // Centralized UI preferences management
 // Single localStorage key for all UI state (panel visibility, widths, collapsed nodes, etc.)
 
+import { handleError, safeLocalStorage, safeJSONParse, safeJSONStringify } from "./error-handler"
+
 const UI_PREFS_KEY = "infoMapperUIv1"
 
 export type ObjectTreePrefs = {
@@ -32,10 +34,16 @@ type UIPrefs = {
 
 export function getUIPrefs(): UIPrefs {
   try {
-    const raw = localStorage.getItem(UI_PREFS_KEY)
+    const raw = safeLocalStorage.getItem(UI_PREFS_KEY)
     if (!raw) return {}
-    return JSON.parse(raw)
-  } catch {
+    return safeJSONParse<UIPrefs>(raw, {}, 'ui-interaction')
+  } catch (error) {
+    handleError({
+      context: 'ui-interaction',
+      error,
+      action: 'getUIPrefs',
+      userMessage: undefined, // Don't show toast for read failures
+    })
     return {}
   }
 }
@@ -44,8 +52,18 @@ export function setUIPrefs(prefs: UIPrefs): void {
   try {
     const existing = getUIPrefs()
     const merged = { ...existing, ...prefs }
-    localStorage.setItem(UI_PREFS_KEY, JSON.stringify(merged))
-  } catch {}
+    const serialized = safeJSONStringify(merged, 'ui-interaction')
+    if (serialized) {
+      safeLocalStorage.setItem(UI_PREFS_KEY, serialized)
+    }
+  } catch (error) {
+    handleError({
+      context: 'ui-interaction',
+      error,
+      action: 'setUIPrefs',
+      userMessage: undefined, // Don't show toast for UI prefs - not critical
+    })
+  }
 }
 
 export function getObjectTreePrefs(): ObjectTreePrefs {
