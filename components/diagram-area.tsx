@@ -12,6 +12,7 @@ interface DiagramAreaProps {
   connections: Connection[]
   positionUpdateCounter?: number
   collapseCounter?: number
+  filterUpdateCounter?: number
   activeView?: string
   onAddItem: (itemId: string, itemType: "entity" | "source" | "requirement", left: number, top: number) => void
   onHideItem: (itemId: string) => void
@@ -46,6 +47,7 @@ export function DiagramArea({
   connections,
   positionUpdateCounter,
   collapseCounter,
+  filterUpdateCounter,
   activeView,
   onAddItem,
   onHideItem,
@@ -248,7 +250,7 @@ export function DiagramArea({
             return sourceItem?.hidden === false && targetItem?.hidden === false
           })
           .map((connection) => (
-            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} activeView={activeView} />
+            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} filterUpdateCounter={filterUpdateCounter} activeView={activeView} />
           ))}
       </div>
     </div>

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import type { Concept, LogicalEntity, LogicalAttribute } from "@/lib/types"
 import { ObjectTree } from "./object-tree"
 import { ObjectDetails } from "./object-details"
-import { ObjectIssues } from "./object-issues"
 import { getObjectTreePrefs, setObjectTreePrefs } from "@/lib/ui-prefs"
 import { ImButton } from "./ui/im-button"
 import { IntelligentFilter } from "./ui/intelligent-filter"
@@ -104,7 +103,7 @@ export function ObjectViewV2({
   }, [])
 
   return (
-    <div className="flex flex-1 overflow-hidden text-sm">
+    <div className="flex flex-1 overflow-hidden text-sm" style={{ height: '100%' }}>
       {isLeftPanelVisible ? (
       <aside className="bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto" style={{ width: `${leftPanelWidth}px`, maxWidth: '40vw', minWidth: '220px' }}>
         <ObjectTree
@@ -184,7 +183,7 @@ export function ObjectViewV2({
         {/* IntelligentFilter Section - fixed header (not sticky) */}
         <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
           <div className="mb-3">
-            <h2 className="text-sm font-semibold text-gray-900 mb-2">Object v2 (Experimental)</h2>
+            <h2 className="text-sm font-semibold text-gray-900 mb-2">Object</h2>
             <IntelligentFilter
               schema={objectFilterSchema}
               data={attributes}
@@ -286,9 +285,6 @@ export function ObjectViewV2({
           />
         </div>
       </main>
-      <aside className="w-[260px] overflow-y-auto">
-        <ObjectIssues concepts={concepts} entities={entities} attributes={attributes} onSelect={(node) => setSelected(node)} />
-      </aside>
     </div>
   )
 }

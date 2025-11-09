@@ -71,7 +71,7 @@ export function SourcesTree({
   const match = (text: string) => text.toLowerCase().includes(query.toLowerCase())
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       <div className="mb-3 space-y-2">
         <div className="flex items-center gap-2" role="search">
           <ImInput
@@ -113,7 +113,7 @@ export function SourcesTree({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="space-y-1">
         <ul className="space-y-1">
           {data.systems.map((sys) => {
             const openSys = openSystemIds.has(sys.id)

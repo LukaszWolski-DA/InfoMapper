@@ -170,6 +170,7 @@ export default function InfoMapperPage() {
   const [connections, setConnections] = useState<Connection[]>(getObjectState().connections)
   const [positionUpdateCounter, setPositionUpdateCounter] = useState(0)
   const [collapseCounter, setCollapseCounter] = useState(0)
+  const [filterUpdateCounter, setFilterUpdateCounter] = useState(0)
   const [entityFilter, setEntityFilter] = useState("")
   const [sourceFilter, setSourceFilter] = useState("")
   const [requirementFilter, setRequirementFilter] = useState("")
@@ -543,7 +544,14 @@ export default function InfoMapperPage() {
 
   const toggleShowOnlyMapped = (itemId: string) => cmdToggleDiagramItemShowOnlyMapped(itemId)
 
-  const setAttributeFilter = (itemId: string, filter: "all" | "mapped" | "unmapped" | "keys") => cmdSetDiagramItemAttributeFilter(itemId, filter)
+  const setAttributeFilter = (itemId: string, filter: "all" | "mapped" | "unmapped" | "keys") => {
+    cmdSetDiagramItemAttributeFilter(itemId, filter)
+    // Delay counter increment to allow DOM to update (same pattern as collapse)
+    setTimeout(() => {
+      setFilterUpdateCounter(prev => prev + 1) // Clears cache in ConnectionLine
+      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
+    }, 50)
+  }
 
   const updateItemWidth = (itemId: string, width: number) => cmdUpdateDiagramItemWidth(itemId, width)
 
@@ -1068,6 +1076,7 @@ export default function InfoMapperPage() {
               connections={connections}
               positionUpdateCounter={positionUpdateCounter}
               collapseCounter={collapseCounter}
+              filterUpdateCounter={filterUpdateCounter}
               activeView={activeSection}
               onAddItem={addItemToDiagram}
               onHideItem={hideItem}

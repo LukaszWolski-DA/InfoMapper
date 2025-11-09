@@ -21,7 +21,7 @@ interface SourcesViewV2Props {
 export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
   const [selected, setSelected] = useState<{ type: "object" | "column" | "schema" | "database" | "system"; id: string } | null>(null)
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true)
-  const [leftPanelWidth, setLeftPanelWidth] = useState(340)
+  const [leftPanelWidth, setLeftPanelWidth] = useState(380)
   const [dataState, setDataState] = useState<SourcesDomainData>(data)
   const [isImportOpen, setIsImportOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -152,9 +152,9 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden text-sm">
+    <div className="flex flex-1 overflow-hidden text-sm" style={{ height: '100%' }}>
       {isLeftPanelVisible ? (
-        <aside className="bg-gray-50 border-r border-gray-200 p-4 flex flex-col flex-shrink-0" style={{ width: `${leftPanelWidth}px`, maxWidth: '40vw', minWidth: '220px' }}>
+        <aside className="bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto" style={{ width: `${leftPanelWidth}px`, maxWidth: '40vw', minWidth: '220px' }}>
           <SourcesTree data={filteredData} selected={selected} onSelect={setSelected} isLeftPanelVisible={isLeftPanelVisible} onToggleLeftPanelVisible={setIsLeftPanelVisible} />
         </aside>
       ) : (
@@ -193,8 +193,8 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
         />
       )}
 
-      <main className="flex-1 overflow-auto">
-        <div className="px-4 py-3 border-b border-gray-200 bg-white sticky top-0 z-10 space-y-3">
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-900">Sources v2 (Experimental)</h2>
             <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
@@ -239,11 +239,10 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
             showExamples={true}
           />
         </div>
-        <SourcesDetails data={filteredData} selected={selected} />
+        <div className="flex-1 overflow-auto">
+          <SourcesDetails data={filteredData} selected={selected} />
+        </div>
       </main>
-      <aside className="w-[260px] overflow-y-auto">
-        <SourcesIssues data={filteredData} onSelect={setSelected} />
-      </aside>
     </div>
   )
 }

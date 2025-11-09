@@ -10,6 +10,9 @@ import { ImButton } from "@/components/ui/im-button"
 import { IntelligentFilter } from "@/components/ui/intelligent-filter"
 import { requirementsFilterSchema, objectFilterSchema } from "@/lib/filter/schemas"
 import type { Connection, LogicalAttribute, LogicalEntity, Concept } from "@/lib/types"
+import MDEditor from '@uiw/react-md-editor'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface RequirementRow {
   id: string
@@ -171,7 +174,7 @@ export function RequirementsViewV2({
         <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
           <div className="mb-3">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-gray-900">Requirements v2 (with Dual Filters)</h2>
+              <h2 className="text-sm font-semibold text-gray-900">Requirements</h2>
               <label className="inline-flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
@@ -282,8 +285,14 @@ export function RequirementsViewV2({
               <ImInput value={formName} onChange={(e) => setFormName(e.target.value)} />
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Requirement Description</div>
-              <textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" style={{ height: `calc(var(--size-textarea-row) * 3)` }} />
+              <div className="text-xs text-gray-500 mb-1">Requirement Description (Markdown supported)</div>
+              <MDEditor
+                value={formDesc}
+                onChange={(val) => setFormDesc(val || "")}
+                preview="edit"
+                height={250}
+                data-color-mode="light"
+              />
             </div>
             <div>
               <div className="text-xs text-gray-500 mb-1">Requirement Type</div>
@@ -302,15 +311,15 @@ export function RequirementsViewV2({
       </Dialog>
 
       {/* Table area - scrollable */}
-      <div className="flex-1 overflow-auto">
-        <table className="im-table">
+      <div className="flex-1 overflow-auto p-4">
+        <table className="im-table border border-gray-200">
           <thead className="im-thead">
             <tr>
               <th className="im-th">REQ_ID</th>
               <th className="im-th">Requirement Name</th>
               <th className="im-th">Requirement Description</th>
               <th className="im-th">Requirement Type</th>
-              <th className="im-th"></th>
+              <th className="im-th text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -346,7 +355,11 @@ export function RequirementsViewV2({
                       <DialogHeader>
                         <DialogTitle>Requirement Description</DialogTitle>
                       </DialogHeader>
-                      <div className="text-sm text-gray-700 whitespace-pre-wrap">{r.description || "(no description)"}</div>
+                      <div className="text-sm text-gray-700 prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {r.description || "(no description)"}
+                        </ReactMarkdown>
+                      </div>
                     </DialogContent>
                   </Dialog>
                 </td>
@@ -358,7 +371,7 @@ export function RequirementsViewV2({
                   </span>
                 </td>
                 <td className="im-td">
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 justify-end">
                     <ImButton variant="neutral" onClick={() => openEdit(r)}>Edit</ImButton>
                     <ImButton
                       variant="danger"

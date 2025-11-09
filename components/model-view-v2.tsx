@@ -276,7 +276,7 @@ export function ModelViewV2({
           <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
             <div className="mb-3">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-semibold text-gray-900">Model v2 (with Intelligent Filter)</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Model (with Intelligent Filter)</h2>
                 <label className="inline-flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
                   <input
                     type="checkbox"

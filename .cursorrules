@@ -1,0 +1,44 @@
+# InfoMapper Development Rules
+
+## Code walktrough
+
+- Check the code exactly, never hipothesize
+
+## Architecture Patterns
+
+- Follow layered architecture: Domain → Projection → UI → Sources
+- Use command pattern for state mutations (lib/commands.ts)
+- Never modify store state directly - always use command functions
+- Use projection functions to transform domain models to UI views
+
+## Component Standards
+
+- Follow naming convention: `type_object_context` (see docs/INFOMAPPER_COMPONENT_REFERENCE_v1.0.md)
+- Use `im-*` prefix for custom UI components (im-button, im-input, etc.)
+- Maintain 28px control height for consistency
+- Use 12px base font size, 10px for data types, 14px for headings
+
+## TypeScript Requirements
+
+- Strict mode enabled - no `any` types
+- Explicit return types for all functions
+- Use proper types from lib/types.ts and lib/source-types.ts
+
+## ID Generation
+
+- Use lib/id.ts utilities for generating IDs
+- Follow pattern: `{prefix}_{timestamp}{random}`
+- Never create IDs manually
+
+## Error Handling
+
+- Use centralized error-handler.ts
+- Show user-friendly toast notifications
+- Handle localStorage failures gracefully
+
+## References
+
+See comprehensive documentation in:
+- docs/INFOMAPPER_DATA_MODEL_v1.0.md
+- docs/INFOMAPPER_COMPONENT_REFERENCE_v1.0.md
+- docs/ui-ux-consistency v1.md
