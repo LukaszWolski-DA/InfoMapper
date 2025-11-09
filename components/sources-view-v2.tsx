@@ -75,6 +75,7 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
     isForeignKey: z.boolean().optional(),
     defaultValue: z.string().optional(),
     comment: z.string().optional(),
+    tags: z.array(z.enum(["BusinessKey", "LinkBusinessKey", "ChildKey", "DictionaryKey", "DictionaryChildKey", "PIIAttribute"])).optional(),
   })
 
   const SourceObjectSchema = z.object({

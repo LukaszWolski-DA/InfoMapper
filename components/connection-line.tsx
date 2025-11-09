@@ -25,10 +25,11 @@ interface ConnectionLineProps {
   positionUpdateCounter?: number
   collapseCounter?: number
   filterUpdateCounter?: number
+  editFormCounter?: number
   activeView?: string
 }
 
-export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1, positionUpdateCounter, collapseCounter, filterUpdateCounter, activeView }: ConnectionLineProps) {
+export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1, positionUpdateCounter, collapseCounter, filterUpdateCounter, editFormCounter, activeView }: ConnectionLineProps) {
   const lineRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({
     startX: 0,
@@ -217,11 +218,11 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
     setPosition({ startX, startY, endX, endY, angle })
   }, [connection.source.attrId, connection.source.itemId, connection.target.attrId, connection.target.itemId, zoom, isVisible, positionUpdateCounter])
 
-  // Reset cache when connection endpoints change, cards collapse/expand, filters change, or view changes
+  // Reset cache when connection endpoints change, cards collapse/expand, filters change, edit forms open/close, or view changes
   useEffect(() => {
     sourceElRef.current = null
     targetElRef.current = null
-  }, [connection.source.itemId, connection.target.itemId, collapseCounter, filterUpdateCounter, activeView])
+  }, [connection.source.itemId, connection.target.itemId, collapseCounter, filterUpdateCounter, editFormCounter, activeView])
 
   // Reset canvas cache when activeView changes to prevent stale coordinates
   useEffect(() => {

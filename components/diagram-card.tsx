@@ -7,6 +7,7 @@ import type { DiagramItem, Connection, Attribute, Entity, Source, Requirement } 
 import { genLogicalAttributeId, genConnectionId } from "@/lib/id"
 import { ImButton } from "./ui/im-button"
 import { ImInput } from "./ui/im-input"
+import { getSourceColumnTagBadge, type SourceColumnTag } from "@/lib/source-types"
 
 interface DiagramCardProps {
   item: DiagramItem
@@ -30,6 +31,7 @@ interface DiagramCardProps {
   onAddCustomAttribute: (itemId: string, attribute: Attribute) => void
   onUpdateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
   onDeleteAttribute: (itemId: string, attrId: string) => void
+  onAttributeEditStateChange?: () => void // Triggers position update when attribute edit form opens/closes
   onCreateRelationship?: (sourceId: string, targetId: string) => void // Tylko dla trybu model
   allEntities: Entity[]
   allSources: Source[]
@@ -66,6 +68,7 @@ export const DiagramCard = memo(function DiagramCard({
   onAddCustomAttribute,
   onUpdateAttribute,
   onDeleteAttribute,
+  onAttributeEditStateChange,
   onCreateRelationship,
   allEntities,
   allSources,
@@ -90,11 +93,28 @@ export const DiagramCard = memo(function DiagramCard({
   const [editIsPrimaryKey, setEditIsPrimaryKey] = useState(false)
   const [editIsForeignKey, setEditIsForeignKey] = useState(false)
   const [editIsPII, setEditIsPII] = useState(false)
+  const [editTags, setEditTags] = useState<SourceColumnTag[]>([])
   const [isRelationshipDragTarget, setIsRelationshipDragTarget] = useState(false)
 
   // Throttling drag updates to ~1/frame using requestAnimationFrame
   const pendingPositionRef = useRef<{ left: number; top: number } | null>(null)
   const rafIdRef = useRef<number | null>(null)
+
+  // Trigger connection line position update when edit form opens/closes
+  // The form element has data-attr-id so ConnectionLine can find it,
+  // but we need to trigger recalculation because card height changes
+  useEffect(() => {
+    if (editingAttrId !== null) {
+      // Form just opened - trigger update after short delay for DOM to settle
+      const timer = setTimeout(() => {
+        onAttributeEditStateChange?.()
+      }, 50)
+      return () => clearTimeout(timer)
+    } else {
+      // Form just closed - trigger update immediately
+      onAttributeEditStateChange?.()
+    }
+  }, [editingAttrId, onAttributeEditStateChange])
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging || !cardRef.current) return
@@ -495,29 +515,55 @@ export const DiagramCard = memo(function DiagramCard({
     setEditIsPrimaryKey(!!attr.isPrimaryKey)
     setEditIsForeignKey(!!attr.isForeignKey)
     setEditIsPII(attr.isPII || false)
+    setEditTags((attr.tags as SourceColumnTag[]) || [])
   }
 
   const handleSaveEdit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!editAttrName.trim() || !editingAttrId) return
 
-    const updates: Partial<Attribute> = {
-      name: editAttrName.trim(),
-      nameEn: editAttrName.trim(),
-      stereotype: editIsPrimaryKey ? "PK" : editIsForeignKey ? "FK" : "Attribute",
-      isPrimaryKey: editIsPrimaryKey,
-      isForeignKey: editIsForeignKey,
-      isPII: editIsPII,
-    }
+    if (item.itemType === "source") {
+      // For sources, update tags in localStorage
+      try {
+        const raw = localStorage.getItem("infoMapperSourcesV1")
+        if (raw) {
+          const sourcesData = JSON.parse(raw)
 
-    onUpdateAttribute(item.itemId, editingAttrId, updates)
-    // Event już nie jest potrzebny - onUpdateAttribute wywołuje bezpośrednio komendę do store
+          // Find the source object
+          for (const obj of sourcesData.objects) {
+            const col = obj.columns.find((c: any) => c.id === editingAttrId)
+            if (col) {
+              col.tags = editTags
+              break
+            }
+          }
+
+          localStorage.setItem("infoMapperSourcesV1", JSON.stringify(sourcesData))
+          window.dispatchEvent(new CustomEvent("sources-data-updated"))
+        }
+      } catch (e) {
+        console.error("Failed to save source tags:", e)
+      }
+    } else {
+      // For entities, update via store
+      const updates: Partial<Attribute> = {
+        name: editAttrName.trim(),
+        nameEn: editAttrName.trim(),
+        stereotype: editIsPrimaryKey ? "PK" : editIsForeignKey ? "FK" : "Attribute",
+        isPrimaryKey: editIsPrimaryKey,
+        isForeignKey: editIsForeignKey,
+        isPII: editIsPII,
+      }
+
+      onUpdateAttribute(item.itemId, editingAttrId, updates)
+    }
 
     setEditingAttrId(null)
     setEditAttrName("")
     setEditIsPrimaryKey(false)
     setEditIsForeignKey(false)
     setEditIsPII(false)
+    setEditTags([])
   }
 
   const handleDeleteAttribute = (attrId: string, attrName: string) => {
@@ -730,6 +776,7 @@ export const DiagramCard = memo(function DiagramCard({
                 return (
                   <form
                     key={attr.id}
+                    data-attr-id={attr.id}
                     onSubmit={handleSaveEdit}
                     className="p-3 bg-gray-50 rounded-md border border-gray-300"
                     onClick={(e) => e.stopPropagation()}
@@ -741,37 +788,73 @@ export const DiagramCard = memo(function DiagramCard({
                         onChange={(e) => setEditAttrName(e.target.value)}
                         placeholder="Attribute name"
                         autoFocus
+                        disabled={item.itemType === "source"}
                       />
                     </div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <label className="flex items-center text-xs text-gray-700 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editIsPrimaryKey}
-                          onChange={(e) => setEditIsPrimaryKey(e.target.checked)}
-                          className="mr-1.5"
-                        />
-                        Primary Key
-                      </label>
-                      <label className="flex items-center text-xs text-gray-700 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editIsForeignKey}
-                          onChange={(e) => setEditIsForeignKey(e.target.checked)}
-                          className="mr-1.5"
-                        />
-                        Foreign Key
-                      </label>
-                      <label className="flex items-center text-xs text-gray-700 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editIsPII}
-                          onChange={(e) => setEditIsPII(e.target.checked)}
-                          className="mr-1.5"
-                        />
-                        Is PII
-                      </label>
-                    </div>
+
+                    {/* Conditional rendering based on item type */}
+                    {item.itemType === "source" ? (
+                      // Source tags checkboxes
+                      <div className="mb-3">
+                        <div className="text-xs text-gray-600 mb-2">Tags:</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(["BusinessKey", "LinkBusinessKey", "ChildKey", "DictionaryKey", "DictionaryChildKey", "PIIAttribute"] as SourceColumnTag[]).map(tag => {
+                            const { label, color } = getSourceColumnTagBadge(tag)
+                            const isSelected = editTags.includes(tag)
+                            return (
+                              <label key={tag} className="flex items-center text-xs cursor-pointer" title={tag}>
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setEditTags([...editTags, tag])
+                                    } else {
+                                      setEditTags(editTags.filter(t => t !== tag))
+                                    }
+                                  }}
+                                  className="mr-1.5"
+                                />
+                                <span className={`px-1.5 py-0.5 rounded border ${isSelected ? color : 'bg-gray-50 text-gray-400 border-gray-200'}`}>
+                                  {label}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      // Entity PK/FK/PII checkboxes
+                      <div className="flex items-center gap-3 mb-3">
+                        <label className="flex items-center text-xs text-gray-700 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editIsPrimaryKey}
+                            onChange={(e) => setEditIsPrimaryKey(e.target.checked)}
+                            className="mr-1.5"
+                          />
+                          Primary Key
+                        </label>
+                        <label className="flex items-center text-xs text-gray-700 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editIsForeignKey}
+                            onChange={(e) => setEditIsForeignKey(e.target.checked)}
+                            className="mr-1.5"
+                          />
+                          Foreign Key
+                        </label>
+                        <label className="flex items-center text-xs text-gray-700 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editIsPII}
+                            onChange={(e) => setEditIsPII(e.target.checked)}
+                            className="mr-1.5"
+                          />
+                          Is PII
+                        </label>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <ImButton
                         type="submit"
@@ -789,17 +872,19 @@ export const DiagramCard = memo(function DiagramCard({
                       >
                         Cancel
                       </ImButton>
-                      <ImButton
-                        type="button"
-                        variant="danger"
-                        className="ml-auto"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteAttribute(attr.id, attr.name)
-                        }}
-                      >
-                        Delete
-                      </ImButton>
+                      {item.itemType !== "source" && (
+                        <ImButton
+                          type="button"
+                          variant="danger"
+                          className="ml-auto"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteAttribute(attr.id, attr.name)
+                          }}
+                        >
+                          Delete
+                        </ImButton>
+                      )}
                     </div>
                   </form>
                 )
@@ -842,16 +927,35 @@ export const DiagramCard = memo(function DiagramCard({
                   title="Double-click to edit"
                 >
                   <span className="flex-1 text-gray-700">{attr.name}</span>
-                  {/* Badge order: PK → FK → PII; supports showing all at once */}
-                  {attr.isPrimaryKey && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-2">PK</span>
-                  )}
-                  {attr.isForeignKey && (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded ml-1">FK</span>
-                  )}
-                  {attr.isPII && (
-                    <span className="text-xs bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded ml-1">PII</span>
-                  )}
+                  <div className="flex items-center gap-1 ml-2">
+                    {/* Badge order: PK → FK → PII → Source Tags; supports showing all at once */}
+                    {attr.isPrimaryKey && (
+                      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200">PK</span>
+                    )}
+                    {attr.isForeignKey && (
+                      <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">FK</span>
+                    )}
+                    {attr.isPII && (
+                      <span className="text-xs bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded border border-pink-200">PII</span>
+                    )}
+                    {/* Source column tags (only for source items) */}
+                    {item.itemType === "source" && attr.tags && attr.tags.length > 0 && (
+                      <>
+                        {attr.tags.map((tag) => {
+                          const { label, color } = getSourceColumnTagBadge(tag as SourceColumnTag)
+                          return (
+                            <span
+                              key={tag}
+                              className={`text-xs px-1.5 py-0.5 rounded border ${color}`}
+                              title={tag}
+                            >
+                              {label}
+                            </span>
+                          )
+                        })}
+                      </>
+                    )}
+                  </div>
                 </div>
               )
             })}
@@ -935,7 +1039,7 @@ export const DiagramCard = memo(function DiagramCard({
       )}
 
       <div className="flex gap-2">
-        {hasAttributes && !item.collapsed && !showAddForm && (
+        {hasAttributes && !item.collapsed && !showAddForm && item.itemType !== "source" && (
           <ImButton
             variant="primary"
             onClick={(e) => {

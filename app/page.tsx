@@ -171,6 +171,7 @@ export default function InfoMapperPage() {
   const [positionUpdateCounter, setPositionUpdateCounter] = useState(0)
   const [collapseCounter, setCollapseCounter] = useState(0)
   const [filterUpdateCounter, setFilterUpdateCounter] = useState(0)
+  const [editFormCounter, setEditFormCounter] = useState(0)
   const [entityFilter, setEntityFilter] = useState("")
   const [sourceFilter, setSourceFilter] = useState("")
   const [requirementFilter, setRequirementFilter] = useState("")
@@ -276,6 +277,7 @@ export default function InfoMapperPage() {
             isForeignKey: z.boolean().optional(),
             defaultValue: z.string().optional(),
             comment: z.string().optional(),
+            tags: z.array(z.enum(["BusinessKey", "LinkBusinessKey", "ChildKey", "DictionaryKey", "DictionaryChildKey", "PIIAttribute"])).optional(),
           }),
         ),
       }),
@@ -308,6 +310,7 @@ export default function InfoMapperPage() {
           nameEn: c.name,
           stereotype: c.isPrimaryKey ? "PK" : c.isForeignKey ? "FK" : "Attribute",
           dataType: formatColumnType(c.dataType as any),
+          tags: c.tags, // Pass through source column tags
         })),
       }
     })
@@ -841,6 +844,15 @@ export default function InfoMapperPage() {
   // Requirements są wczytywane ze store przez subscribe (L181-187)
   // Brak potrzeby osobnego useEffect - requirements są już w globalnym stanie
 
+  // Listen for sources-data-updated event (when tags are edited in Sources View)
+  useEffect(() => {
+    const handler = () => {
+      handleSourcesDataUpdated()
+    }
+    window.addEventListener("sources-data-updated", handler as EventListener)
+    return () => window.removeEventListener("sources-data-updated", handler as EventListener)
+  }, [])
+
   // Track visited views for lazy mounting
   useEffect(() => {
     setVisitedViews(prev => new Set([...prev, activeSection]))
@@ -1077,6 +1089,7 @@ export default function InfoMapperPage() {
               positionUpdateCounter={positionUpdateCounter}
               collapseCounter={collapseCounter}
               filterUpdateCounter={filterUpdateCounter}
+              editFormCounter={editFormCounter}
               activeView={activeSection}
               onAddItem={addItemToDiagram}
               onHideItem={hideItem}
@@ -1092,6 +1105,10 @@ export default function InfoMapperPage() {
               onAddCustomAttribute={addCustomAttribute}
               onUpdateAttribute={updateAttribute}
               onDeleteAttribute={deleteAttribute}
+              onAttributeEditStateChange={() => {
+                setEditFormCounter(prev => prev + 1) // Clear element cache in ConnectionLine
+                setPositionUpdateCounter(prev => prev + 1) // Trigger position recalculation
+              }}
               entities={mappingProjection.entities}
               customSources={mappingProjection.sources}
               customRequirements={mappingProjection.requirements}

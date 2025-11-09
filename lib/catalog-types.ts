@@ -23,20 +23,42 @@ export interface CatalogConfig {
 
 // Identyfikatory standardowych kolumn (możliwe rozszerzenia pluginami)
 export type CatalogColumnId =
+  // Logical Model - Concept
   | "concept"
+  // Logical Model - Entity
   | "entity"
+  | "entityStereotype"
+  | "entityDescription"
+  | "entityTags"
+  // Logical Model - Attribute
   | "attribute"
   | "attributeDataType"
-  | "isPII"
+  | "attributeIsPrimaryKey"
+  | "attributeIsForeignKey"
+  | "attributeIsNullable"
+  | "attributeIsPII"
+  | "attributeDescription"
+  | "attributeOrder"
+  // Source System Hierarchy
   | "sourceSystem"
   | "sourceDatabase"
   | "sourceSchema"
   | "sourceObject"
+  // Source Column
   | "sourceColumn"
   | "sourceDataType"
+  | "sourceNullable"
+  | "sourceIsPrimaryKey"
+  | "sourceIsForeignKey"
+  | "sourceDefaultValue"
+  | "sourceComment"
+  | "sourceTags"
+  // Mapping & Coverage
+  | "mapped"
   | "requirementIds"
   | "relationshipHint"
-  | "mapped"
+  // Legacy (kept for compatibility)
+  | "isPII" // deprecated, use attributeIsPII
 
 // Znormalizowany wiersz katalogu po projekcji i joinach
 export interface CatalogRow {
@@ -45,28 +67,51 @@ export interface CatalogRow {
   entityId?: string
   attributeId?: string
 
-  // Object (logical model)
+  // Logical Model - Concept
   conceptName?: string
+
+  // Logical Model - Entity
   entityName?: string
+  entityStereotype?: string
+  entityDescription?: string
+  entityTags?: string[]
+
+  // Logical Model - Attribute
   attributeName?: string
   attributeDataType?: string
-  isPII?: boolean
+  attributeIsPrimaryKey?: boolean
+  attributeIsForeignKey?: boolean
+  attributeIsNullable?: boolean
+  attributeIsPII?: boolean
+  attributeDescription?: string
+  attributeOrder?: number
 
-  // Sources (projekcja z domain JSON)
+  // Source System Hierarchy
   sourceSystem?: string
   sourceDatabase?: string
   sourceSchema?: string
   sourceObject?: string
+
+  // Source Column
   sourceColumn?: string
   sourceDataType?: string
+  sourceNullable?: boolean
+  sourceIsPrimaryKey?: boolean
+  sourceIsForeignKey?: boolean
+  sourceDefaultValue?: string
+  sourceComment?: string
+  sourceTags?: string[] // BK, LBK, CK, DK, DCK, PII
 
-  // Mapping / Requirements / Relationships (MVP – uproszczone)
+  // Mapping / Requirements / Relationships
   requirementIds?: string[]
-  relationshipHint?: string // np. label relacji encji
+  relationshipHint?: string
 
   // Coverage
   mapped?: boolean
   issues?: string[]
+
+  // Legacy (deprecated)
+  isPII?: boolean // use attributeIsPII instead
 }
 
 // Model kolumn – jak wyświetlać wartości

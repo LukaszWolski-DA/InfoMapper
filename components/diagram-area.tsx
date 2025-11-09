@@ -13,6 +13,7 @@ interface DiagramAreaProps {
   positionUpdateCounter?: number
   collapseCounter?: number
   filterUpdateCounter?: number
+  editFormCounter?: number
   activeView?: string
   onAddItem: (itemId: string, itemType: "entity" | "source" | "requirement", left: number, top: number) => void
   onHideItem: (itemId: string) => void
@@ -35,6 +36,7 @@ interface DiagramAreaProps {
   onAddCustomAttribute: (itemId: string, attribute: Attribute) => void
   onUpdateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
   onDeleteAttribute: (itemId: string, attrId: string) => void
+  onAttributeEditStateChange?: () => void
   // Nowe: pełna lista encji (projekcja z Object) do wykorzystania na diagramie
   entities?: Entity[]
   customEntities?: Entity[]
@@ -48,6 +50,7 @@ export function DiagramArea({
   positionUpdateCounter,
   collapseCounter,
   filterUpdateCounter,
+  editFormCounter,
   activeView,
   onAddItem,
   onHideItem,
@@ -63,6 +66,7 @@ export function DiagramArea({
   onAddCustomAttribute,
   onUpdateAttribute,
   onDeleteAttribute,
+  onAttributeEditStateChange,
   entities,
   customEntities,
   customSources,
@@ -236,6 +240,7 @@ export function DiagramArea({
             onAddCustomAttribute={onAddCustomAttribute}
             onUpdateAttribute={onUpdateAttribute}
             onDeleteAttribute={onDeleteAttribute}
+            onAttributeEditStateChange={onAttributeEditStateChange}
             allEntities={allEntities}
             allSources={allSources}
             allRequirements={allRequirements}
@@ -250,7 +255,7 @@ export function DiagramArea({
             return sourceItem?.hidden === false && targetItem?.hidden === false
           })
           .map((connection) => (
-            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} filterUpdateCounter={filterUpdateCounter} activeView={activeView} />
+            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} filterUpdateCounter={filterUpdateCounter} editFormCounter={editFormCounter} activeView={activeView} />
           ))}
       </div>
     </div>

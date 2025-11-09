@@ -1,5 +1,13 @@
 export type SourceObjectType = "table" | "view"
 
+export type SourceColumnTag =
+  | "BusinessKey"
+  | "LinkBusinessKey"
+  | "ChildKey"
+  | "DictionaryKey"
+  | "DictionaryChildKey"
+  | "PIIAttribute"
+
 export interface SourceSystem {
   id: string
   name: string
@@ -34,6 +42,7 @@ export interface SourceColumn {
   isForeignKey?: boolean
   defaultValue?: string
   comment?: string
+  tags?: SourceColumnTag[]
 }
 
 export interface SourceObject {
@@ -51,6 +60,19 @@ export interface SourcesDomainData {
   databases: SourceDatabase[]
   schemas: SourceSchema[]
   objects: SourceObject[]
+}
+
+// Helper function to get tag badge properties
+export function getSourceColumnTagBadge(tag: SourceColumnTag): { label: string; color: string } {
+  const tagMap: Record<SourceColumnTag, { label: string; color: string }> = {
+    BusinessKey: { label: "BK", color: "bg-blue-100 text-blue-800 border-blue-200" },
+    LinkBusinessKey: { label: "LBK", color: "bg-purple-100 text-purple-800 border-purple-200" },
+    ChildKey: { label: "CK", color: "bg-green-100 text-green-800 border-green-200" },
+    DictionaryKey: { label: "DK", color: "bg-orange-100 text-orange-800 border-orange-200" },
+    DictionaryChildKey: { label: "DCK", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+    PIIAttribute: { label: "PII", color: "bg-red-100 text-red-800 border-red-200" },
+  }
+  return tagMap[tag]
 }
 
 

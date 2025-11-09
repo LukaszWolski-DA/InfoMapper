@@ -34,29 +34,36 @@ function evaluateCondition(
   
   // Get field value using path accessor
   const fieldValue = fieldDef.path(item, context)
-  
+
   // Handle null/undefined
   if (fieldValue === null || fieldValue === undefined) {
     return false
   }
-  
-  // Convert to string for comparison (handles numbers, booleans)
-  const valueStr = String(fieldValue)
-  
+
+  // Normalize boolean values for comparison
+  const normalizeValue = (val: any): string => {
+    if (typeof val === 'boolean') {
+      return val ? 'true' : 'false'
+    }
+    return String(val).toLowerCase()
+  }
+
+  const fieldValueNormalized = normalizeValue(fieldValue)
+
   // Apply operator
   switch (condition.operator) {
     case '=':
-      return valueStr === String(condition.value)
-    
+      return fieldValueNormalized === normalizeValue(condition.value)
+
     case '!=':
-      return valueStr !== String(condition.value)
+      return fieldValueNormalized !== normalizeValue(condition.value)
     
     case 'IN':
       if (!Array.isArray(condition.value)) return false
-      return condition.value.map(v => String(v)).includes(valueStr)
-    
+      return condition.value.map(v => normalizeValue(v)).includes(fieldValueNormalized)
+
     case 'LIKE':
-      return matchLike(valueStr, String(condition.value))
+      return matchLike(fieldValueNormalized, normalizeValue(condition.value))
     
     case '>':
       return Number(fieldValue) > Number(condition.value)

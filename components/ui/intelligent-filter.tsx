@@ -17,8 +17,9 @@ import type { FilterSchema, ParseError } from "@/lib/filter/types"
 export interface IntelligentFilterProps<T> {
   schema: FilterSchema
   data: T[]
-  onChange: (filtered: T[]) => void
+  onChange: (filtered: T[], query?: string) => void
   contextBuilder?: (item: T) => any
+  contextData?: (item: T) => any
   placeholder?: string
   showExamples?: boolean
   compact?: boolean
@@ -91,9 +92,9 @@ export function IntelligentFilter<T>({
   // Call onChange when filteredData changes (side effect in useEffect)
   // Note: onChange (setState) is stable and doesn't need to be in dependencies
   useEffect(() => {
-    onChange(filteredData)
+    onChange(filteredData, query)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredData])
+  }, [filteredData, query])
 
   const handleClear = useCallback(() => {
     setQuery("")

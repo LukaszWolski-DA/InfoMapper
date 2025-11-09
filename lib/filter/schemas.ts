@@ -126,7 +126,7 @@ export const objectFilterSchema: FilterSchema = {
 
 /**
  * Requirements Filter Schema
- * 
+ *
  * Supports filtering requirements by REQ_ID, name, type, and description.
  */
 export const requirementsFilterSchema: FilterSchema = {
@@ -160,6 +160,121 @@ export const requirementsFilterSchema: FilterSchema = {
     'RequirementType = "Functional"',
     'RequirementName LIKE "Auth%"',
     'RequirementType IN ("Functional", "Non-functional")'
+  ]
+}
+
+/**
+ * Catalog Filter Schema
+ *
+ * Supports filtering catalog rows by concept, entity, attribute, sources, and mapping status.
+ */
+export const catalogFilterSchema: FilterSchema = {
+  name: 'Catalog',
+  defaultField: 'Attribute',
+  fields: [
+    // Logical Model - Concept
+    {
+      key: 'Concept',
+      type: 'string',
+      path: (row) => row.conceptName,
+      description: 'Concept name (business domain)'
+    },
+    // Logical Model - Entity
+    {
+      key: 'Entity',
+      type: 'string',
+      path: (row) => row.entityName,
+      description: 'Entity name (logical object)'
+    },
+    {
+      key: 'EntityStereotype',
+      type: 'enum',
+      values: ['Object', 'Link', 'Dictionary', 'Context', 'Informative'],
+      path: (row) => row.entityStereotype,
+      description: 'Entity stereotype'
+    },
+    // Logical Model - Attribute
+    {
+      key: 'Attribute',
+      type: 'string',
+      path: (row) => row.attributeName,
+      description: 'Attribute name (column)'
+    },
+    {
+      key: 'AttributeDataType',
+      type: 'string',
+      path: (row) => row.attributeDataType,
+      description: 'Attribute data type'
+    },
+    {
+      key: 'AttributeIsPrimaryKey',
+      type: 'boolean',
+      path: (row) => row.attributeIsPrimaryKey,
+      description: 'Whether attribute is a primary key'
+    },
+    {
+      key: 'AttributeIsForeignKey',
+      type: 'boolean',
+      path: (row) => row.attributeIsForeignKey,
+      description: 'Whether attribute is a foreign key'
+    },
+    {
+      key: 'AttributeIsPII',
+      type: 'boolean',
+      path: (row) => row.attributeIsPII,
+      description: 'Whether attribute contains PII data'
+    },
+    // Source System Hierarchy
+    {
+      key: 'SourceSystem',
+      type: 'string',
+      path: (row) => row.sourceSystem,
+      description: 'Source system name'
+    },
+    {
+      key: 'SourceDatabase',
+      type: 'string',
+      path: (row) => row.sourceDatabase,
+      description: 'Source database name'
+    },
+    {
+      key: 'SourceSchema',
+      type: 'string',
+      path: (row) => row.sourceSchema,
+      description: 'Source schema name'
+    },
+    {
+      key: 'SourceObject',
+      type: 'string',
+      path: (row) => row.sourceObject,
+      description: 'Source table/object name'
+    },
+    {
+      key: 'SourceColumn',
+      type: 'string',
+      path: (row) => row.sourceColumn,
+      description: 'Source column name'
+    },
+    // Mapping & Coverage
+    {
+      key: 'Mapped',
+      type: 'boolean',
+      path: (row) => row.mapped,
+      description: 'Whether attribute is mapped to source'
+    }
+  ],
+  supportedOperators: ['=', '!=', 'IN', 'LIKE'],
+  examples: [
+    'Customer',
+    'Concept = "Sales"',
+    'Entity = "Customer"',
+    'Attribute LIKE "%Name"',
+    'Mapped = true',
+    'AttributeIsPII = true',
+    'SourceDatabase = "PROD_DWH"',
+    'Concept = "Customer" AND Mapped = false',
+    'AttributeIsPII = true AND Mapped = true',
+    'Entity LIKE "Person%" AND SourceSystem = "HR"'
   ]
 }
 

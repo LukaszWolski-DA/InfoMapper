@@ -1,7 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import type { SourcesDomainData, SourceObject } from "@/lib/source-types"
+import type { SourcesDomainData, SourceObject, SourceColumnTag } from "@/lib/source-types"
+import { getSourceColumnTagBadge } from "@/lib/source-types"
 import { ImButton } from "./ui/im-button"
 
 interface SourcesDetailsProps {
@@ -9,31 +10,78 @@ interface SourcesDetailsProps {
   selected: { type: "object" | "column" | "schema" | "database" | "system"; id: string } | null
 }
 
+const ALL_TAGS: SourceColumnTag[] = [
+  "BusinessKey",
+  "LinkBusinessKey",
+  "ChildKey",
+  "DictionaryKey",
+  "DictionaryChildKey",
+  "PIIAttribute"
+]
+
 export function SourcesDetails({ data, selected }: SourcesDetailsProps) {
   const [tab, setTab] = useState<"overview" | "columns">("overview")
+  const [localData, setLocalData] = useState<SourcesDomainData>(data)
+
+  // Update local data when prop changes
+  useMemo(() => {
+    setLocalData(data)
+  }, [data])
+
+  const handleToggleTag = (columnId: string, tag: SourceColumnTag) => {
+    const updatedData = { ...localData }
+
+    for (const obj of updatedData.objects) {
+      const col = obj.columns.find(c => c.id === columnId)
+      if (col) {
+        if (!col.tags) {
+          col.tags = []
+        }
+        const tagIndex = col.tags.indexOf(tag)
+        if (tagIndex > -1) {
+          col.tags.splice(tagIndex, 1)
+        } else {
+          col.tags.push(tag)
+        }
+        break
+      }
+    }
+
+    setLocalData(updatedData)
+
+    // Persist to localStorage
+    try {
+      localStorage.setItem("infoMapperSourcesV1", JSON.stringify(updatedData))
+
+      // Dispatch custom event to notify other components about the change
+      window.dispatchEvent(new CustomEvent("sources-data-updated"))
+    } catch (e) {
+      console.error("Failed to save sources data:", e)
+    }
+  }
 
   const selectedObject: SourceObject | null = useMemo(() => {
     if (selected?.type === "object") {
-      return data.objects.find((o) => o.id === selected.id) || null
+      return localData.objects.find((o) => o.id === selected.id) || null
     }
     if (selected?.type === "column") {
-      const obj = data.objects.find((o) => o.columns.some((c) => c.id === selected.id))
+      const obj = localData.objects.find((o) => o.columns.some((c) => c.id === selected.id))
       return obj || null
     }
     return null
-  }, [selected, data.objects])
+  }, [selected, localData.objects])
 
   const fqn = useMemo(() => {
     if (!selectedObject) return "—"
-    const sch = data.schemas.find((s) => s.id === selectedObject.schemaId)
+    const sch = localData.schemas.find((s) => s.id === selectedObject.schemaId)
     if (!sch) return selectedObject.name
-    const db = data.databases.find((d) => d.id === sch.databaseId)
-    const sys = db ? data.systems.find((s) => s.id === db.systemId) : undefined
+    const db = localData.databases.find((d) => d.id === sch.databaseId)
+    const sys = db ? localData.systems.find((s) => s.id === db.systemId) : undefined
     const sysName = sys?.name || "?"
     const dbName = db?.name || "?"
     const schName = sch?.name || "?"
     return `${sysName}.${dbName}.${schName}.${selectedObject.name}`
-  }, [selectedObject, data])
+  }, [selectedObject, localData])
 
   if (!selected) {
     return (
@@ -90,6 +138,7 @@ export function SourcesDetails({ data, selected }: SourcesDetailsProps) {
                     <th className="text-left px-3 py-2 border-b">FK</th>
                     <th className="text-left px-3 py-2 border-b">Default</th>
                     <th className="text-left px-3 py-2 border-b">Comment</th>
+                    <th className="text-left px-3 py-2 border-b">Tags</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -105,6 +154,26 @@ export function SourcesDetails({ data, selected }: SourcesDetailsProps) {
                       <td className="px-3 py-2 border-b">{c.isForeignKey ? "FK" : ""}</td>
                       <td className="px-3 py-2 border-b">{c.defaultValue ?? ""}</td>
                       <td className="px-3 py-2 border-b">{c.comment ?? ""}</td>
+                      <td className="px-3 py-2 border-b">
+                        <div className="flex flex-wrap gap-1">
+                          {ALL_TAGS.map(tag => {
+                            const isSelected = c.tags?.includes(tag) || false
+                            const { label, color } = getSourceColumnTagBadge(tag)
+                            return (
+                              <button
+                                key={tag}
+                                onClick={() => handleToggleTag(c.id, tag)}
+                                className={`px-1.5 py-0.5 text-xs rounded border cursor-pointer transition-opacity ${
+                                  isSelected ? color : 'bg-gray-50 text-gray-400 border-gray-200 opacity-50 hover:opacity-100'
+                                }`}
+                                title={tag}
+                              >
+                                {label}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

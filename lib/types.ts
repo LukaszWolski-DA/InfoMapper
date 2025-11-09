@@ -33,6 +33,7 @@ export interface Attribute {
   isForeignKey?: boolean
   isPII?: boolean // Added PII flag for data governance
   dataType?: string
+  tags?: string[] // Source column tags (for imported sources only)
 }
 
 export interface DiagramItem {

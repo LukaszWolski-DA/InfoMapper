@@ -18,7 +18,22 @@ export function buildCatalogRows(params: {
     systems: { id: string; name: string }[]
     databases: { id: string; systemId: string; name: string }[]
     schemas: { id: string; databaseId: string; name: string }[]
-    objects: { id: string; schemaId: string; name: string; columns: { id: string; name: string; dataType?: { base?: string; length?: number; precision?: number; scale?: number } }[] }[]
+    objects: {
+      id: string
+      schemaId: string
+      name: string
+      columns: {
+        id: string
+        name: string
+        dataType?: { base?: string; length?: number; precision?: number; scale?: number }
+        nullable?: boolean
+        isPrimaryKey?: boolean
+        isForeignKey?: boolean
+        defaultValue?: string
+        comment?: string
+        tags?: string[] // BK, LBK, CK, DK, DCK, PIIAttribute
+      }[]
+    }[]
   }
 }) {
   const { config, concepts, entities, attributes, connections, sourcesDomain } = params
@@ -52,7 +67,24 @@ export function buildCatalogRows(params: {
   }
 
   // indeksy źródeł
-  const objById = new Map<string, { id: string; schemaId: string; name: string; columns: { id: string; name: string; dataType?: { base?: string; length?: number; precision?: number; scale?: number } }[] }>()
+  type SourceColumn = {
+    id: string
+    name: string
+    dataType?: { base?: string; length?: number; precision?: number; scale?: number }
+    nullable?: boolean
+    isPrimaryKey?: boolean
+    isForeignKey?: boolean
+    defaultValue?: string
+    comment?: string
+    tags?: string[]
+  }
+  type SourceObject = {
+    id: string
+    schemaId: string
+    name: string
+    columns: SourceColumn[]
+  }
+  const objById = new Map<string, SourceObject>()
   const schById = new Map<string, { id: string; databaseId: string; name: string }>()
   const dbById = new Map<string, { id: string; systemId: string; name: string }>()
   const sysById = new Map<string, { id: string; name: string }>()
@@ -102,8 +134,17 @@ export function buildCatalogRows(params: {
         attributeId: a.id,
         conceptName: concept?.name,
         entityName: e?.name,
+        entityStereotype: e?.stereotype,
+        entityDescription: e?.description,
+        entityTags: e?.tags,
         attributeName: a.name,
         attributeDataType: a.dataType,
+        attributeIsPrimaryKey: a.isPrimaryKey,
+        attributeIsForeignKey: a.isForeignKey,
+        attributeIsNullable: a.isNullable,
+        attributeIsPII: a.isPII,
+        attributeDescription: a.description,
+        attributeOrder: a.order,
         isPII: a.isPII,
         mapped: false,
         issues: ["No mapping"],
@@ -116,8 +157,9 @@ export function buildCatalogRows(params: {
       const sch = obj ? schById.get(obj.schemaId) : undefined
       const db = sch ? dbById.get(sch.databaseId) : undefined
       const sys = db ? sysById.get(db.systemId) : undefined
-      const colName = obj?.columns.find((c) => c.id === pair.colId)?.name
-      const colType = obj?.columns.find((c) => c.id === pair.colId)?.dataType
+      const col = obj?.columns.find((c) => c.id === pair.colId)
+      const colName = col?.name
+      const colType = col?.dataType
       const colTypeStr = colType?.base
         ? colType.length != null
           ? `${colType.base}(${colType.length})`
@@ -132,8 +174,17 @@ export function buildCatalogRows(params: {
         attributeId: a.id,
         conceptName: concept?.name,
         entityName: e?.name,
+        entityStereotype: e?.stereotype,
+        entityDescription: e?.description,
+        entityTags: e?.tags,
         attributeName: a.name,
         attributeDataType: a.dataType,
+        attributeIsPrimaryKey: a.isPrimaryKey,
+        attributeIsForeignKey: a.isForeignKey,
+        attributeIsNullable: a.isNullable,
+        attributeIsPII: a.isPII,
+        attributeDescription: a.description,
+        attributeOrder: a.order,
         isPII: a.isPII,
         sourceSystem: sys?.name,
         sourceDatabase: db?.name,
@@ -141,6 +192,12 @@ export function buildCatalogRows(params: {
         sourceObject: obj?.name,
         sourceColumn: colName,
         sourceDataType: colTypeStr,
+        sourceNullable: col?.nullable,
+        sourceIsPrimaryKey: col?.isPrimaryKey,
+        sourceIsForeignKey: col?.isForeignKey,
+        sourceDefaultValue: col?.defaultValue,
+        sourceComment: col?.comment,
+        sourceTags: col?.tags,
         mapped: true,
       })
     }

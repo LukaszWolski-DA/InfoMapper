@@ -51,25 +51,27 @@ function parseAdvancedQuery(query: string): FilterExpression {
   
   for (const part of parts) {
     const trimmed = part.trim()
-    
-    // Match: Field = "value"
-    const equalMatch = trimmed.match(/^(\w+)\s*=\s*"([^"]+)"$/i)
+
+    // Match: Field = "value" or Field = true/false (boolean without quotes)
+    const equalMatch = trimmed.match(/^(\w+)\s*=\s*(?:"([^"]+)"|(true|false))$/i)
     if (equalMatch) {
+      const value = equalMatch[2] !== undefined ? equalMatch[2] : equalMatch[3]
       conditions.push({
         field: equalMatch[1],
         operator: '=',
-        value: equalMatch[2]
+        value: value
       })
       continue
     }
-    
-    // Match: Field != "value" or Field <> "value"
-    const notEqualMatch = trimmed.match(/^(\w+)\s*(?:!=|<>)\s*"([^"]+)"$/i)
+
+    // Match: Field != "value" or Field != true/false
+    const notEqualMatch = trimmed.match(/^(\w+)\s*(?:!=|<>)\s*(?:"([^"]+)"|(true|false))$/i)
     if (notEqualMatch) {
+      const value = notEqualMatch[2] !== undefined ? notEqualMatch[2] : notEqualMatch[3]
       conditions.push({
         field: notEqualMatch[1],
         operator: '!=',
-        value: notEqualMatch[2]
+        value: value
       })
       continue
     }
@@ -88,7 +90,10 @@ function parseAdvancedQuery(query: string): FilterExpression {
     // Match: Field IN ("val1", "val2", ...)
     const inMatch = trimmed.match(/^(\w+)\s+IN\s*\(([^)]+)\)$/i)
     if (inMatch) {
-      const values = inMatch[2].split(',').map(v => v.trim().replace(/^"|"$/g, ''))
+      const values = inMatch[2]
+        .split(',')
+        .map(v => v.trim())
+        .map(v => v.replace(/^["']|["']$/g, ''))  // Remove quotes from both ends
       conditions.push({
         field: inMatch[1],
         operator: 'IN',
