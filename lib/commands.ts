@@ -1,4 +1,4 @@
-import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship } from "./types"
+import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig } from "./types"
 import { genConceptId, genLogicalAttributeId, genLogicalEntityId, genRequirementId, genConnectionId, genRelationshipId } from "./id"
 import { getObjectState, setObjectState } from "./store"
 
@@ -279,4 +279,89 @@ export function updateModelRelationship(relationshipId: string, updates: Partial
   }))
 }
 
+// =============================
+// Settings Commands
+// =============================
+
+// Entity Stereotypes
+export function addEntityStereotype(stereotype: EntityStereotypeConfig): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      entityStereotypes: [...prev.settings.entityStereotypes, stereotype],
+    },
+  }))
+}
+
+export function updateEntityStereotype(id: string, updates: Partial<EntityStereotypeConfig>): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      entityStereotypes: prev.settings.entityStereotypes.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+    },
+  }))
+}
+
+export function deleteEntityStereotype(id: string): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      entityStereotypes: prev.settings.entityStereotypes.filter((s) => s.id !== id),
+    },
+  }))
+}
+
+export function reorderEntityStereotypes(stereotypes: EntityStereotypeConfig[]): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      entityStereotypes: stereotypes,
+    },
+  }))
+}
+
+// Source Column Tags
+export function addSourceColumnTag(tag: SourceColumnTagConfig): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      sourceColumnTags: [...prev.settings.sourceColumnTags, tag],
+    },
+  }))
+}
+
+export function updateSourceColumnTag(id: string, updates: Partial<SourceColumnTagConfig>): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      sourceColumnTags: prev.settings.sourceColumnTags.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    },
+  }))
+}
+
+export function deleteSourceColumnTag(id: string): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      sourceColumnTags: prev.settings.sourceColumnTags.filter((t) => t.id !== id),
+    },
+  }))
+}
+
+export function reorderSourceColumnTags(tags: SourceColumnTagConfig[]): void {
+  setObjectState((prev) => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      sourceColumnTags: tags,
+    },
+  }))
+}
 

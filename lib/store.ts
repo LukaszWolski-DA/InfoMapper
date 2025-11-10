@@ -1,5 +1,6 @@
-import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship } from "./types"
+import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig } from "./types"
 import { handleError, safeLocalStorage, safeJSONParse, safeJSONStringify } from "./error-handler"
+import { getDefaultSettings } from "./default-settings"
 
 type RequirementRow = {
   id: string
@@ -7,6 +8,11 @@ type RequirementRow = {
   description?: string
   type?: "Functional" | "Non-functional" | "Other"
   displayId: number
+}
+
+export type SettingsConfig = {
+  entityStereotypes: EntityStereotypeConfig[]
+  sourceColumnTags: SourceColumnTagConfig[]
 }
 
 type GlobalState = {
@@ -21,6 +27,8 @@ type GlobalState = {
   // Model domain
   modelItems: DiagramItem[]
   modelRelationships: Relationship[]
+  // Settings domain
+  settings: SettingsConfig
   version: number
 }
 
@@ -39,6 +47,7 @@ let state: GlobalState = {
   connections: [],
   modelItems: [],
   modelRelationships: [],
+  settings: getDefaultSettings(),
   version: 1,
 }
 
@@ -80,6 +89,7 @@ function schedulePersist() {
         connections: state.connections,
         modelItems: state.modelItems,
         modelRelationships: state.modelRelationships,
+        settings: state.settings,
       }
 
       const serialized = safeJSONStringify(next, 'state-management')
@@ -125,6 +135,9 @@ export function initObjectStateFromStorage(): void {
       return
     }
 
+    // Migration: if settings don't exist, use defaults
+    const settings = parsed?.settings || getDefaultSettings()
+
     state = {
       concepts: Array.isArray(parsed?.concepts) ? parsed.concepts : [],
       logicalEntities: Array.isArray(parsed?.logicalEntities) ? parsed.logicalEntities : [],
@@ -134,6 +147,7 @@ export function initObjectStateFromStorage(): void {
       connections: Array.isArray(parsed?.connections) ? parsed.connections : [],
       modelItems: Array.isArray(parsed?.modelItems) ? parsed.modelItems : [],
       modelRelationships: Array.isArray(parsed?.modelRelationships) ? parsed.modelRelationships : [],
+      settings,
       version: 1,
     }
     emit()

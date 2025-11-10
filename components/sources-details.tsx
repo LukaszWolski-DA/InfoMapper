@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import type { SourcesDomainData, SourceObject, SourceColumnTag } from "@/lib/source-types"
 import { getSourceColumnTagBadge } from "@/lib/source-types"
 import { ImButton } from "./ui/im-button"
+import { useSettings } from "@/lib/use-settings"
 
 interface SourcesDetailsProps {
   data: SourcesDomainData
@@ -20,6 +21,7 @@ const ALL_TAGS: SourceColumnTag[] = [
 ]
 
 export function SourcesDetails({ data, selected }: SourcesDetailsProps) {
+  const settings = useSettings()
   const [tab, setTab] = useState<"overview" | "columns">("overview")
   const [localData, setLocalData] = useState<SourcesDomainData>(data)
 
@@ -158,7 +160,7 @@ export function SourcesDetails({ data, selected }: SourcesDetailsProps) {
                         <div className="flex flex-wrap gap-1">
                           {ALL_TAGS.map(tag => {
                             const isSelected = c.tags?.includes(tag) || false
-                            const { label, color } = getSourceColumnTagBadge(tag)
+                            const { label, color } = getSourceColumnTagBadge(tag, settings.sourceColumnTags)
                             return (
                               <button
                                 key={tag}

@@ -117,3 +117,25 @@ export interface LogicalAttribute {
   description?: string
   order?: number
 }
+
+// ============================
+// Settings types
+// ============================
+
+export interface EntityStereotypeConfig {
+  id: string // e.g., "object", "link"
+  label: string // e.g., "Object", "Link"
+  color?: string // Tailwind color classes
+  isDefault: boolean // Default types cannot be deleted
+  order: number
+}
+
+export interface SourceColumnTagConfig {
+  id: string // e.g., "BusinessKey"
+  label: string // e.g., "BK"
+  description?: string
+  color: string // Tailwind bg/text classes
+  borderColor: string // Tailwind border class
+  isDefault: boolean // Default tags cannot be deleted
+  order: number
+}

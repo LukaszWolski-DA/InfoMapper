@@ -8,6 +8,7 @@ import { DependencyPanel } from "@/components/dependency-panel"
 import { ModelViewV2 } from "@/components/model-view-v2"
 import { ObjectViewV2 } from "@/components/object-view-v2"
 import { InstructionsView } from "@/components/instructions-view"
+import { SettingsView } from "@/components/settings-view"
 import { projectEntities, projectMapping, projectModel } from "@/lib/projections"
 import { SourcesViewV2 } from "@/components/sources-view-v2"
 import { CatalogView } from "@/components/catalog-view"
@@ -203,6 +204,7 @@ export default function InfoMapperPage() {
   const [concepts, setConcepts] = useState<Concept[]>(getObjectState().concepts)
   const [logicalEntities, setLogicalEntities] = useState<LogicalEntity[]>(getObjectState().logicalEntities)
   const [logicalAttributes, setLogicalAttributes] = useState<LogicalAttribute[]>(getObjectState().logicalAttributes)
+  const [settings, setSettings] = useState(getObjectState().settings)
 
   const projectedEntities: Entity[] = useMemo(
     () => projectEntities({ concepts, logicalEntities, logicalAttributes }),
@@ -247,6 +249,7 @@ export default function InfoMapperPage() {
       setModelDiagramItems(s.modelItems)
       setModelRelationships(s.modelRelationships)
       setStoreRequirements((s.requirements as any) || [])
+      setSettings(s.settings)
     })
     return () => unsub()
   }, [])
@@ -410,7 +413,7 @@ export default function InfoMapperPage() {
   const updateLogicalEntity = (id: string, updates: Partial<LogicalEntity>) => {
     cmdUpdateEntity(id, updates)
     if (Object.prototype.hasOwnProperty.call(updates, "stereotype")) {
-      const nextType = normalizeStereotype(updates.stereotype as string)
+      const nextType = normalizeStereotype(updates.stereotype as string, settings.entityStereotypes)
       // Synchronizuj objectType w diagramach (itemId encji = id LogicalEntity)
       const state = getObjectState()
       // Update Mapping diagram
@@ -486,10 +489,10 @@ export default function InfoMapperPage() {
         const data = PersistedStateSchema.parse(raw)
         // Normalize objectType dla encji
         const normItems = (data.items || []).map((it) => {
-          return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string) } : it
+          return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string, settings.entityStereotypes) } : it
         }) as unknown as DiagramItem[]
         const normModelItems = (data.modelItems || []).map((it) => {
-          return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string) } : it
+          return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string, settings.entityStereotypes) } : it
         }) as unknown as DiagramItem[]
         setDiagramItems(normItems)
         setConnections(data.connections)
@@ -727,12 +730,14 @@ export default function InfoMapperPage() {
       const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEY)
       if (!raw) return
       const parsed = PersistedStateSchema.parse(JSON.parse(raw))
+      // Get current settings for normalization
+      const currentSettings = getObjectState().settings
       // normalize stereotypes in diagram items on load
       const normItems = (parsed.items || []).map((it) => {
-        return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string) } : it
+        return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string, currentSettings.entityStereotypes) } : it
       }) as unknown as DiagramItem[]
       const normModelItems = (parsed.modelItems || []).map((it) => {
-        return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string) } : it
+        return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string, currentSettings.entityStereotypes) } : it
       }) as unknown as DiagramItem[]
       setDiagramItems(normItems)
       setConnections(parsed.connections)
@@ -998,17 +1003,13 @@ export default function InfoMapperPage() {
           </div>
         )}
 
-        {/* Settings View (Placeholder) */}
+        {/* Settings View */}
         {visitedViews.has("settings") && (
           <div
-            className={activeSection === "settings" ? "flex-1 flex items-center justify-center bg-gray-50" : "hidden"}
+            className={activeSection === "settings" ? "block" : "hidden"}
             style={{ height: '100%', width: '100%' }}
           >
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Settings</h2>
-              <p className="text-gray-600">Application settings and preferences</p>
-              <p className="text-sm text-gray-500 mt-4">Coming soon...</p>
-            </div>
+            <SettingsView />
           </div>
         )}
 

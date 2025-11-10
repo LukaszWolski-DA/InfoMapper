@@ -8,6 +8,7 @@ import { genLogicalAttributeId, genConnectionId } from "@/lib/id"
 import { ImButton } from "./ui/im-button"
 import { ImInput } from "./ui/im-input"
 import { getSourceColumnTagBadge, type SourceColumnTag } from "@/lib/source-types"
+import { useSettings } from "@/lib/use-settings"
 
 interface DiagramCardProps {
   item: DiagramItem
@@ -76,6 +77,7 @@ export const DiagramCard = memo(function DiagramCard({
   mode = "mapping",
   zoom = 1,
 }: DiagramCardProps) {
+  const settings = useSettings()
   const cardRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -799,7 +801,7 @@ export const DiagramCard = memo(function DiagramCard({
                         <div className="text-xs text-gray-600 mb-2">Tags:</div>
                         <div className="grid grid-cols-2 gap-2">
                           {(["BusinessKey", "LinkBusinessKey", "ChildKey", "DictionaryKey", "DictionaryChildKey", "PIIAttribute"] as SourceColumnTag[]).map(tag => {
-                            const { label, color } = getSourceColumnTagBadge(tag)
+                            const { label, color } = getSourceColumnTagBadge(tag, settings.sourceColumnTags)
                             const isSelected = editTags.includes(tag)
                             return (
                               <label key={tag} className="flex items-center text-xs cursor-pointer" title={tag}>
@@ -942,7 +944,7 @@ export const DiagramCard = memo(function DiagramCard({
                     {item.itemType === "source" && attr.tags && attr.tags.length > 0 && (
                       <>
                         {attr.tags.map((tag) => {
-                          const { label, color } = getSourceColumnTagBadge(tag as SourceColumnTag)
+                          const { label, color } = getSourceColumnTagBadge(tag as string, settings.sourceColumnTags)
                           return (
                             <span
                               key={tag}
