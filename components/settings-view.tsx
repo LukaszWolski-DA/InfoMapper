@@ -9,7 +9,7 @@ export function SettingsView() {
   const [activeTab, setActiveTab] = useState("stereotypes")
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex-1 flex flex-col h-full bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
         <h1 className="text-xl font-semibold text-gray-900">Settings</h1>

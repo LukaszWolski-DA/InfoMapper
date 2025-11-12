@@ -1,24 +1,24 @@
 "use client"
 
+import type { ViewType } from "@/app/router/view-router"
+
 interface TopNavProps {
-  activeSection: string
-  onSectionChange: (section: string) => void
+  activeView: ViewType
+  onViewChange: (view: ViewType) => void
 }
 
-  const sections = [
+  const sections: Array<{ id: ViewType; label: string }> = [
     { id: "instructions", label: "Instructions" },
-    { id: "sources_v2", label: "Sources" },
-    { id: "object_v2", label: "Object" },
-    { id: "model_v2", label: "Model" },
-    { id: "requirements_v2", label: "Requirements" },
+    { id: "sources", label: "Sources" },
+    { id: "object", label: "Object" },
+    { id: "model", label: "Model" },
+    { id: "requirements", label: "Requirements" },
     { id: "mapping", label: "Mapping" },
     { id: "catalog", label: "Catalog" },
-    { id: "validation", label: "Validation" },
-    { id: "export", label: "Export" },
     { id: "settings", label: "Settings" },
   ]
 
-export function TopNav({ activeSection, onSectionChange }: TopNavProps) {
+export function TopNav({ activeView, onViewChange }: TopNavProps) {
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="flex items-center h-12 px-6">
@@ -32,13 +32,13 @@ export function TopNav({ activeSection, onSectionChange }: TopNavProps) {
           {sections.map((section) => (
             <button
               key={section.id}
-              onClick={() => onSectionChange(section.id)}
+              onClick={() => onViewChange(section.id)}
               className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                activeSection === section.id ? "text-gray-900" : "text-gray-600 hover:text-gray-900"
+                activeView === section.id ? "text-gray-900" : "text-gray-600 hover:text-gray-900"
               }`}
             >
               {section.label}
-              {activeSection === section.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />}
+              {activeView === section.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />}
             </button>
           ))}
         </div>
