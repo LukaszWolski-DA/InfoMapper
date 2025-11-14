@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { MappingViewV2 } from '@/components/mapping-view-v2'
+import { MappingView } from './views/mapping-view'
 import { ModelViewV2 } from '@/components/model-view-v2'
 import { ObjectViewV2 } from '@/components/object-view-v2'
 import { SourcesViewV2 } from '@/components/sources-view-v2'
@@ -85,48 +85,11 @@ interface ViewRouterProps {
   // Requirements view
   connections: Connection[]
 
-  // Mapping view
-  diagramItems: DiagramItem[]
-  positionUpdateCounter: number
-  collapseCounter: number
-  filterUpdateCounter: number
-  editFormCounter: number
-  selectedAttribute: {
-    itemId: string
-    itemType: 'entity' | 'source' | 'requirement'
-    attrId: string
-    attrName: string
-  } | null
+  // Mapping view (fully managed by hooks internally)
   importedSources: Source[]
   requirementsForUi: Requirement[]
-  addItemToDiagram: (itemId: string, itemType: 'entity' | 'source' | 'requirement', left: number, top: number) => void
-  hideItem: (itemId: string) => void
-  updateItemPosition: (itemId: string, left: number, top: number) => void
   onAttributeEditStateChange: () => void
-  addConnection: (connection: Connection) => void
-  deleteConnection: (connectionId: string) => void
-  setSelectedAttribute: (
-    attr: {
-      itemId: string
-      itemType: 'entity' | 'source' | 'requirement'
-      attrId: string
-      attrName: string
-    } | null
-  ) => void
-  toggleItemCollapsed: (itemId: string) => void
   updateItemObjectType: (itemId: string, objectType: string) => void
-  setAttributeFilter: (itemId: string, filter: 'all' | 'mapped' | 'unmapped' | 'keys') => void
-  updateItemWidth: (itemId: string, width: number) => void
-  addCustomAttribute: (itemId: string, attribute: Attribute) => void
-  updateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
-  deleteAttribute: (itemId: string, attrId: string) => void
-  // Mapping view - Sidebar props
-  entityFilter: string
-  sourceFilter: string
-  requirementFilter: string
-  onEntityFilterChange: (query: string) => void
-  onSourceFilterChange: (query: string) => void
-  onRequirementFilterChange: (query: string) => void
   onAddCustomEntity: (name: string, objectType?: string) => void
   onAddCustomEntityWithConcept?: (conceptId: string, name: string, objectType?: string) => void
   onAddCustomSource: (name: string, database?: string) => void
@@ -152,34 +115,10 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
   switch (activeView) {
     case 'mapping':
       return (
-        <MappingViewV2
-          // DiagramArea props
-          diagramItems={props.diagramItems}
-          connections={props.connections}
-          positionUpdateCounter={props.positionUpdateCounter}
-          collapseCounter={props.collapseCounter}
-          filterUpdateCounter={props.filterUpdateCounter}
-          editFormCounter={props.editFormCounter}
-          onAddItem={props.addItemToDiagram}
-          onHideItem={props.hideItem}
-          onUpdatePosition={props.updateItemPosition}
+        <MappingView
+          // UI callbacks
           onAttributeEditStateChange={props.onAttributeEditStateChange}
-          onAddConnection={props.addConnection}
-          onDeleteConnection={props.deleteConnection}
-          onToggleCollapsed={props.toggleItemCollapsed}
-          onUpdateObjectType={props.updateItemObjectType}
-          onSetAttributeFilter={props.setAttributeFilter}
-          onUpdateWidth={props.updateItemWidth}
-          onAddCustomAttribute={props.addCustomAttribute}
-          onUpdateAttribute={props.updateAttribute}
-          onDeleteAttribute={props.deleteAttribute}
-          // Sidebar props
-          entityFilter={props.entityFilter}
-          sourceFilter={props.sourceFilter}
-          requirementFilter={props.requirementFilter}
-          onEntityFilterChange={props.onEntityFilterChange}
-          onSourceFilterChange={props.onSourceFilterChange}
-          onRequirementFilterChange={props.onRequirementFilterChange}
+          // Domain data
           concepts={props.concepts}
           logicalEntities={props.logicalEntities}
           logicalAttributes={props.logicalAttributes}
@@ -187,13 +126,13 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
           importedSources={props.importedSources}
           requirementsForUi={props.requirementsForUi}
           sourcesRawData={props.sourcesRawData}
+          // CRUD callbacks
           onAddCustomEntity={props.onAddCustomEntity}
           onAddCustomEntityWithConcept={props.onAddCustomEntityWithConcept}
           onAddCustomSource={props.onAddCustomSource}
           onAddCustomRequirement={props.onAddCustomRequirement}
-          // DependencyPanel props
-          selectedAttribute={props.selectedAttribute}
-          onSelectAttribute={props.setSelectedAttribute}
+          // Item updates
+          onUpdateObjectType={props.updateItemObjectType}
         />
       )
 

@@ -22,6 +22,7 @@ interface ConnectionLineProps {
   connection: Connection
   onDelete: (connectionId: string) => void
   zoom?: number
+  diagramItems?: import("@/lib/types").DiagramItem[]
   positionUpdateCounter?: number
   collapseCounter?: number
   filterUpdateCounter?: number
@@ -29,7 +30,7 @@ interface ConnectionLineProps {
   activeView?: string
 }
 
-export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1, positionUpdateCounter, collapseCounter, filterUpdateCounter, editFormCounter, activeView }: ConnectionLineProps) {
+export const ConnectionLine = memo(function ConnectionLine({ connection, onDelete, zoom = 1, diagramItems, positionUpdateCounter, collapseCounter, filterUpdateCounter, editFormCounter, activeView }: ConnectionLineProps) {
   const lineRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({
     startX: 0,
@@ -44,190 +45,289 @@ export const ConnectionLine = memo(function ConnectionLine({ connection, onDelet
   // Visibility tracking for performance optimization
   const [isVisible, setIsVisible] = useState(true)
 
-  // Element cache refs to reduce querySelector calls
-  const sourceElRef = useRef<Element | null>(null)
-  const targetElRef = useRef<Element | null>(null)
-  const canvasElRef = useRef<HTMLElement | null>(null)
-
   const updatePosition = useCallback(() => {
     // Skip position calculation if not visible
     if (!isVisible) return
 
-    let sourceEl: Element | null = sourceElRef.current
-    let targetEl: Element | null = targetElRef.current
-    let canvasEl: HTMLElement | null = canvasElRef.current
-    let sourceIsCard = false
-    let targetIsCard = false
+    // ============================
+    // HYBRID POSITIONING APPROACH
+    // Prefer handles from state, but fallback to card-level positioning
+    // ============================
+    let sourceItem: import("@/lib/types").DiagramItem | undefined
+    let targetItem: import("@/lib/types").DiagramItem | undefined
 
-    // Only query if cache miss or elements changed
-    const needsRefresh = !sourceEl || !targetEl || !canvasEl
-
-    // CRITICAL: Query canvas FIRST before source/target to scope element searches to visible canvas only
-    if (needsRefresh || !canvasEl) {
-      const allCanvases = document.querySelectorAll(".mapping-canvas")
-      canvasEl = Array.from(allCanvases).find(el => {
-        const style = window.getComputedStyle(el as HTMLElement)
-        return style.display !== 'none'
-      }) as HTMLElement | null || null
-      canvasElRef.current = canvasEl
+    if (diagramItems) {
+      sourceItem = diagramItems.find((item) => item.itemId === connection.source.itemId)
+      targetItem = diagramItems.find((item) => item.itemId === connection.target.itemId)
     }
 
-    if (!canvasEl) return
-
-    // Try to find source element (scoped to visible canvas)
-    if (needsRefresh || !sourceEl) {
-      if (connection.source.attrId) {
-        // First try to find the attribute within visible canvas
-        sourceEl = canvasEl.querySelector(`[data-attr-id="${connection.source.attrId}"]`)
-
-        if (!sourceEl) {
-          sourceEl = canvasEl.querySelector(`[data-item-id="${connection.source.itemId}"]`)
-          sourceIsCard = true
-        }
-      } else {
-        // Entity/requirement level connection
-        sourceEl = canvasEl.querySelector(`[data-item-id="${connection.source.itemId}"]`)
-        sourceIsCard = true
-      }
-      sourceElRef.current = sourceEl
+    // Validate that both items exist
+    if (!sourceItem || !targetItem) {
+      // Items don't exist - don't render the line (return without setting position)
+      return
     }
 
-    // Try to find target element (scoped to visible canvas)
-    if (needsRefresh || !targetEl) {
-      if (connection.target.attrId) {
-        // First try to find the attribute within visible canvas
-        targetEl = canvasEl.querySelector(`[data-attr-id="${connection.target.attrId}"]`)
+    // Check if either card is collapsed
+    const isSourceCollapsed = sourceItem.collapsed
+    const isTargetCollapsed = targetItem.collapsed
 
-        if (!targetEl) {
-          targetEl = canvasEl.querySelector(`[data-item-id="${connection.target.itemId}"]`)
-          targetIsCard = true
-        }
-      } else {
-        // Entity/requirement level connection
-        targetEl = canvasEl.querySelector(`[data-item-id="${connection.target.itemId}"]`)
-        targetIsCard = true
-      }
-      targetElRef.current = targetEl
-    }
+    // Check if specific connection attributes have handles (are visible)
+    const sourceAttrHasHandle = connection.source.attrId
+      ? sourceItem.handles?.some(h => h.attrId === connection.source.attrId)
+      : false
+    const targetAttrHasHandle = connection.target.attrId
+      ? targetItem.handles?.some(h => h.attrId === connection.target.attrId)
+      : false
 
-    if (!sourceEl || !targetEl) return
+    // CASE 1: BOTH cards collapsed OR both connection attributes missing - connect edge centers
+    if ((isSourceCollapsed || !sourceAttrHasHandle) && (isTargetCollapsed || !targetAttrHasHandle)) {
+      const sourceWidth = sourceItem.width || 200
+      const targetWidth = targetItem.width || 200
+      const sourceHeight = sourceItem.height || 100
+      const targetHeight = targetItem.height || 100
 
-    const sourceRect = sourceEl.getBoundingClientRect()
-    const targetRect = targetEl.getBoundingClientRect()
-    const canvasRect = canvasEl.getBoundingClientRect()
+      // Calculate relative positions to determine which edges to connect
+      const dx = targetItem.left - sourceItem.left
+      const dy = targetItem.top - sourceItem.top
 
-    // Convert to unscaled canvas coordinates (divide by zoom)
-    let sx = (sourceRect.left - canvasRect.left) / zoom
-    let sy = (sourceRect.top - canvasRect.top) / zoom
-    let sw = sourceRect.width / zoom
-    let sh = sourceRect.height / zoom
+      let startX, startY, endX, endY
 
-    let tx = (targetRect.left - canvasRect.left) / zoom
-    let ty = (targetRect.top - canvasRect.top) / zoom
-    let tw = targetRect.width / zoom
-    let th = targetRect.height / zoom
-
-    let sourceCenterY = sy + sh / 2
-    let targetCenterY = ty + th / 2
-
-    // If source is a card (entity-level), try to find entity name element
-    if (sourceIsCard) {
-      const sourceNameEl = (sourceEl as HTMLElement).querySelector('[data-entity-name="true"]') as HTMLElement | null
-      if (sourceNameEl) {
-        const nameRect = sourceNameEl.getBoundingClientRect()
-        const ny = (nameRect.top - canvasRect.top) / zoom
-        const nh = nameRect.height / zoom
-        sourceCenterY = ny + nh / 2
-      }
-    }
-
-    // If target is a card (entity-level), try to find entity name element
-    if (targetIsCard) {
-      const targetNameEl = (targetEl as HTMLElement).querySelector('[data-entity-name="true"]') as HTMLElement | null
-      if (targetNameEl) {
-        const nameRect = targetNameEl.getBoundingClientRect()
-        const ny = (nameRect.top - canvasRect.top) / zoom
-        const nh = nameRect.height / zoom
-        targetCenterY = ny + nh / 2
-      }
-    }
-
-    const sourceCenterX = sx + sw / 2
-    const targetCenterX = tx + tw / 2
-
-    // Calculate relative position
-    const dx = targetCenterX - sourceCenterX
-    const dy = targetCenterY - sourceCenterY
-
-    let startX, startY, endX, endY
-
-    const isAttributeConnection = connection.source.attrId && connection.target.attrId && !sourceIsCard && !targetIsCard
-
-    if (isAttributeConnection) {
-      // For attribute connections, always anchor to left/right edges
-      if (dx > 0) {
-        // Target is to the right - connect from right edge to left edge
-        startX = sx + sw
-        startY = sourceCenterY
-        endX = tx
-        endY = targetCenterY
-      } else {
-        // Target is to the left - connect from left edge to right edge
-        startX = sx
-        startY = sourceCenterY
-        endX = tx + tw
-        endY = targetCenterY
-      }
-    } else {
-      // For card-to-card connections (or when attribute is hidden), use smart edge detection
+      // Determine layout orientation and calculate edge center positions
       if (Math.abs(dx) > Math.abs(dy)) {
-        // Horizontal connection is dominant
+        // Horizontal layout - connect left/right edges at vertical center
         if (dx > 0) {
-          // Target is to the right
-          startX = sx + sw
-          startY = sourceCenterY
-          endX = tx
-          endY = targetCenterY
+          // Target is to the right of source
+          startX = sourceItem.left + sourceWidth // Right edge of source
+          startY = sourceItem.top + (sourceHeight / 2) // Vertical center
+          endX = targetItem.left // Left edge of target
+          endY = targetItem.top + (targetHeight / 2)
         } else {
-          // Target is to the left
-          startX = sx
-          startY = sourceCenterY
-          endX = tx + tw
-          endY = targetCenterY
+          // Target is to the left of source
+          startX = sourceItem.left // Left edge of source
+          startY = sourceItem.top + (sourceHeight / 2)
+          endX = targetItem.left + targetWidth // Right edge of target
+          endY = targetItem.top + (targetHeight / 2)
         }
       } else {
-        // Vertical connection is dominant
+        // Vertical layout - connect top/bottom edges at horizontal center
         if (dy > 0) {
-          // Target is below
-          startX = sourceCenterX
-          startY = sy + sh
-          endX = targetCenterX
-          endY = ty
+          // Target is below source
+          startX = sourceItem.left + (sourceWidth / 2) // Horizontal center
+          startY = sourceItem.top + sourceHeight // Bottom edge
+          endX = targetItem.left + (targetWidth / 2)
+          endY = targetItem.top // Top edge
         } else {
-          // Target is above
-          startX = sourceCenterX
-          startY = sy
-          endX = targetCenterX
-          endY = ty + th
+          // Target is above source
+          startX = sourceItem.left + (sourceWidth / 2)
+          startY = sourceItem.top // Top edge
+          endX = targetItem.left + (targetWidth / 2)
+          endY = targetItem.top + targetHeight // Bottom edge
         }
+      }
+
+      const angle = Math.atan2(endY - startY, endX - startX)
+      setPosition({ startX, startY, endX, endY, angle })
+      return
+    }
+
+    // CASE 2: SOURCE collapsed/missing BUT TARGET has handle - connect source edge center to target attribute handle
+    if ((isSourceCollapsed || !sourceAttrHasHandle) && targetAttrHasHandle && connection.target.attrId) {
+      const sourceWidth = sourceItem.width || 200
+      const sourceHeight = sourceItem.height || 100
+
+      // Calculate source edge center based on target position
+      const dx = targetItem.left - sourceItem.left
+      const dy = targetItem.top - sourceItem.top
+
+      let startX, startY
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal: use right or left edge center
+        startX = dx > 0 ? sourceItem.left + sourceWidth : sourceItem.left
+        startY = sourceItem.top + (sourceHeight / 2)
+      } else {
+        // Vertical: use bottom or top edge center
+        startX = sourceItem.left + (sourceWidth / 2)
+        startY = dy > 0 ? sourceItem.top + sourceHeight : sourceItem.top
+      }
+
+      // Find best target handle (use existing handle logic)
+      const targetHandles = targetItem.handles?.filter((h) => h.attrId === connection.target.attrId) || []
+      if (targetHandles.length > 0) {
+        // Find closest handle to source edge center
+        let minDistance = Infinity
+        let bestTarget: import("@/lib/types").HandlePosition | undefined
+
+        for (const th of targetHandles) {
+          const distance = Math.sqrt(Math.pow(th.x - startX, 2) + Math.pow(th.y - startY, 2))
+          if (distance < minDistance) {
+            minDistance = distance
+            bestTarget = th
+          }
+        }
+
+        if (bestTarget) {
+          const angle = Math.atan2(bestTarget.y - startY, bestTarget.x - startX)
+          setPosition({ startX, startY, endX: bestTarget.x, endY: bestTarget.y, angle })
+          return
+        }
+      } else {
+        // FALLBACK: Target attribute handle not found (filtered out) - use target edge center too
+        const targetWidth = targetItem.width || 200
+        const targetHeight = targetItem.height || 100
+
+        let endX, endY
+        if (Math.abs(dx) > Math.abs(dy)) {
+          endX = dx > 0 ? targetItem.left : targetItem.left + targetWidth
+          endY = targetItem.top + (targetHeight / 2)
+        } else {
+          endX = targetItem.left + (targetWidth / 2)
+          endY = dy > 0 ? targetItem.top : targetItem.top + targetHeight
+        }
+
+        const angle = Math.atan2(endY - startY, endX - startX)
+        setPosition({ startX, startY, endX, endY, angle })
+        return
       }
     }
 
-    const angle = Math.atan2(endY - startY, endX - startX)
+    // CASE 3: TARGET collapsed/missing BUT SOURCE has handle - connect source attribute handle to target edge center
+    if (sourceAttrHasHandle && (isTargetCollapsed || !targetAttrHasHandle) && connection.source.attrId) {
+      const targetWidth = targetItem.width || 200
+      const targetHeight = targetItem.height || 100
 
-    setPosition({ startX, startY, endX, endY, angle })
-  }, [connection.source.attrId, connection.source.itemId, connection.target.attrId, connection.target.itemId, zoom, isVisible, positionUpdateCounter])
+      // Calculate target edge center based on source position
+      const dx = targetItem.left - sourceItem.left
+      const dy = targetItem.top - sourceItem.top
 
-  // Reset cache when connection endpoints change, cards collapse/expand, filters change, edit forms open/close, or view changes
-  useEffect(() => {
-    sourceElRef.current = null
-    targetElRef.current = null
-  }, [connection.source.itemId, connection.target.itemId, collapseCounter, filterUpdateCounter, editFormCounter, activeView])
+      let endX, endY
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal: use left or right edge center
+        endX = dx > 0 ? targetItem.left : targetItem.left + targetWidth
+        endY = targetItem.top + (targetHeight / 2)
+      } else {
+        // Vertical: use top or bottom edge center
+        endX = targetItem.left + (targetWidth / 2)
+        endY = dy > 0 ? targetItem.top : targetItem.top + targetHeight
+      }
 
-  // Reset canvas cache when activeView changes to prevent stale coordinates
-  useEffect(() => {
-    canvasElRef.current = null
-  }, [activeView])
+      // Find best source handle (use existing handle logic)
+      const sourceHandles = sourceItem.handles?.filter((h) => h.attrId === connection.source.attrId) || []
+      if (sourceHandles.length > 0) {
+        // Find closest handle to target edge center
+        let minDistance = Infinity
+        let bestSource: import("@/lib/types").HandlePosition | undefined
+
+        for (const sh of sourceHandles) {
+          const distance = Math.sqrt(Math.pow(endX - sh.x, 2) + Math.pow(endY - sh.y, 2))
+          if (distance < minDistance) {
+            minDistance = distance
+            bestSource = sh
+          }
+        }
+
+        if (bestSource) {
+          const angle = Math.atan2(endY - bestSource.y, endX - bestSource.x)
+          setPosition({ startX: bestSource.x, startY: bestSource.y, endX, endY, angle })
+          return
+        }
+      } else {
+        // FALLBACK: Source attribute handle not found (filtered out) - use source edge center too
+        const sourceWidth = sourceItem.width || 200
+        const sourceHeight = sourceItem.height || 100
+
+        let startX, startY
+        if (Math.abs(dx) > Math.abs(dy)) {
+          startX = dx > 0 ? sourceItem.left + sourceWidth : sourceItem.left
+          startY = sourceItem.top + (sourceHeight / 2)
+        } else {
+          startX = sourceItem.left + (sourceWidth / 2)
+          startY = dy > 0 ? sourceItem.top + sourceHeight : sourceItem.top
+        }
+
+        const angle = Math.atan2(endY - startY, endX - startX)
+        setPosition({ startX, startY, endX, endY, angle })
+        return
+      }
+    }
+
+    // For attribute-level connections, try to use handles from state
+    if (connection.source.attrId && connection.target.attrId) {
+      // Check if we have handles for both source and target
+      const sourceHandles = sourceItem.handles?.filter((h) => h.attrId === connection.source.attrId) || []
+      const targetHandles = targetItem.handles?.filter((h) => h.attrId === connection.target.attrId) || []
+
+      // If we have handles, use them
+      if (sourceHandles.length > 0 && targetHandles.length > 0) {
+        // Find the shortest connection by calculating distance for all combinations
+        let minDistance = Infinity
+        let bestSource: import("@/lib/types").HandlePosition | undefined
+        let bestTarget: import("@/lib/types").HandlePosition | undefined
+
+        for (const sh of sourceHandles) {
+          for (const th of targetHandles) {
+            const distance = Math.sqrt(Math.pow(th.x - sh.x, 2) + Math.pow(th.y - sh.y, 2))
+            if (distance < minDistance) {
+              minDistance = distance
+              bestSource = sh
+              bestTarget = th
+            }
+          }
+        }
+
+        if (bestSource && bestTarget) {
+          // Use the best handles to position the line
+          const startX = bestSource.x
+          const startY = bestSource.y
+          const endX = bestTarget.x
+          const endY = bestTarget.y
+          const angle = Math.atan2(endY - startY, endX - startX)
+
+          setPosition({ startX, startY, endX, endY, angle })
+          return
+        }
+      }
+
+      // FALLBACK: If handles not available, use card-level approximation
+      // This ensures arrows still render even if handles aren't calculated yet
+      const sourceWidth = sourceItem.width || 200
+      const targetWidth = targetItem.width || 200
+      const approximateHeaderHeight = 140
+      const approximateRowHeight = 41
+
+      // Approximate Y position based on card structure
+      // Note: This is less accurate but ensures visibility
+      const sourceY = sourceItem.top + approximateHeaderHeight + 20
+      const targetY = targetItem.top + approximateHeaderHeight + 20
+
+      // Connect from right edge of source to left edge of target (typical layout)
+      // TRUE SYMMETRIC: both sides with equal padding offset
+      const cardPadding = 16
+      const startX = sourceItem.left + sourceWidth - cardPadding // Right edge - padding
+      const startY = sourceY
+      const endX = targetItem.left + cardPadding // Left edge + padding
+      const endY = targetY
+      const angle = Math.atan2(endY - startY, endX - startX)
+
+      setPosition({ startX, startY, endX, endY, angle })
+      return
+    }
+
+    // For entity-level connections (no attrId), connect card centers
+    // This is a simple fallback for requirement-to-entity connections
+    const sourceX = sourceItem.left + (sourceItem.width || 200) / 2
+    const sourceY = sourceItem.top + (sourceItem.height || 100) / 2
+    const targetX = targetItem.left + (targetItem.width || 200) / 2
+    const targetY = targetItem.top + (targetItem.height || 100) / 2
+    const angle = Math.atan2(targetY - sourceY, targetX - sourceX)
+
+    setPosition({
+      startX: sourceX,
+      startY: sourceY,
+      endX: targetX,
+      endY: targetY,
+      angle
+    })
+  }, [connection.source.attrId, connection.source.itemId, connection.target.attrId, connection.target.itemId, isVisible, diagramItems])
 
   // Throttled version - max 60fps (16ms)
   const throttledUpdate = useMemo(

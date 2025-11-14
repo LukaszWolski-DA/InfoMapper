@@ -9,6 +9,8 @@ import { ImButton } from "./ui/im-button"
 import { IntelligentFilter } from "./ui/intelligent-filter"
 import { objectFilterSchema } from "@/lib/filter/schemas"
 import { useFilteredEntities } from "@/hooks/use-filtered-entities"
+import { normalizeStereotype } from "@/lib/utils"
+import { useSettings } from "@/lib/use-settings"
 
 interface ModelViewV2Props {
   entities: Entity[]
@@ -60,6 +62,7 @@ export function ModelViewV2({
   logicalEntitiesRaw = [],
   logicalAttributesRaw = [],
 }: ModelViewV2Props) {
+  const settings = useSettings()
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true)
   const [leftPanelWidth, setLeftPanelWidth] = useState(340)
   const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(true)
@@ -183,17 +186,9 @@ export function ModelViewV2({
     setFilteredAttributes(logicalAttributesRaw)
   }, [logicalAttributesRaw])
 
-  // Normalize stereotype to allowed list
-  const normalizeStereotype = (val?: string) => {
-    const allowed = ["Object", "Link", "Dictionary", "Context", "Informative"]
-    if (!val) return "Object"
-    const n = val.trim()
-    return allowed.includes(n) ? n : "Object"
-  }
-
   // Wrap: update object type (card) AND logical entity stereotype
   const handleUpdateObjectType = (itemId: string, objectType: string) => {
-    const next = normalizeStereotype(objectType)
+    const next = normalizeStereotype(objectType, settings?.entityStereotypes)
     onUpdateObjectType(itemId, next)
     onUpdateLogicalEntity(itemId, { stereotype: next })
   }

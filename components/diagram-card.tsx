@@ -9,6 +9,7 @@ import { ImButton } from "./ui/im-button"
 import { ImInput } from "./ui/im-input"
 import { getSourceColumnTagBadge, type SourceColumnTag } from "@/lib/source-types"
 import { useSettings } from "@/lib/use-settings"
+import { getStereotypeLabel, getStereotypeColor } from "@/lib/utils"
 
 interface DiagramCardProps {
   item: DiagramItem
@@ -32,6 +33,7 @@ interface DiagramCardProps {
   onAddCustomAttribute: (itemId: string, attribute: Attribute) => void
   onUpdateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
   onDeleteAttribute: (itemId: string, attrId: string) => void
+  onUpdateHandles?: (itemId: string, height: number, handles: import("@/lib/types").HandlePosition[]) => void // Reports handle positions for connections
   onAttributeEditStateChange?: () => void // Triggers position update when attribute edit form opens/closes
   onCreateRelationship?: (sourceId: string, targetId: string) => void // Tylko dla trybu model
   allEntities: Entity[]
@@ -41,18 +43,9 @@ interface DiagramCardProps {
   zoom?: number
 }
 
-const OBJECT_TYPES = ["Object", "Dictionary", "Link", "Context", "Informative"]
 const MIN_WIDTH = 200
 const MAX_WIDTH = 600
 const GRID_SIZE = 16
-
-const OBJECT_TYPE_COLORS: Record<string, string> = {
-  Object: "bg-blue-50 border-blue-200",
-  Link: "bg-teal-50 border-teal-200",
-  Context: "bg-amber-50 border-amber-200",
-  Dictionary: "bg-green-50 border-green-200",
-  Informative: "bg-gray-50 border-gray-200",
-}
 
 export const DiagramCard = memo(function DiagramCard({
   item,
@@ -69,6 +62,7 @@ export const DiagramCard = memo(function DiagramCard({
   onAddCustomAttribute,
   onUpdateAttribute,
   onDeleteAttribute,
+  onUpdateHandles,
   onAttributeEditStateChange,
   onCreateRelationship,
   allEntities,
@@ -454,12 +448,112 @@ export const DiagramCard = memo(function DiagramCard({
 
   const hiddenCount = allAttributes.length - displayedAttributes.length
 
+  // Calculate and report handle positions whenever card layout changes
+  // HYBRID APPROACH: Use DOM measurements for accurate handle positioning
+  // This ensures handles align with actual rendered badge positions
+  useEffect(() => {
+    if (!onUpdateHandles || !cardRef.current) return
+
+    // Use requestAnimationFrame to ensure DOM is fully updated
+    const rafId = requestAnimationFrame(() => {
+      if (!cardRef.current) return
+
+      const cardRect = cardRef.current.getBoundingClientRect()
+      const cardHeight = cardRect.height
+      const handles: import("@/lib/types").HandlePosition[] = []
+
+      if (allAttributes.length > 0 && !item.collapsed) {
+        const cardWidth = item.width || 200
+
+        // Calculate handles only for DISPLAYED attributes (respects filters)
+        // This ensures we don't create handles for hidden/filtered attributes
+        displayedAttributes.forEach((attr) => {
+          // Try to measure actual DOM element position
+          const attrElement = cardRef.current!.querySelector(`[data-attr-id="${attr.id}"]`)
+
+          if (attrElement) {
+            // DOM-based measurement (most accurate)
+            const attrRect = attrElement.getBoundingClientRect()
+            const relativeY = attrRect.top - cardRect.top + (attrRect.height / 2)
+            const absoluteY = item.top + relativeY
+
+            // Use actual attribute box dimensions from DOM for precise anchor positioning
+            // This accounts for varying card widths and attribute content
+            const attrRelativeLeft = attrRect.left - cardRect.left
+            const attrRelativeRight = attrRect.right - cardRect.left
+
+            const leftHandleX = item.left + attrRelativeLeft // Left edge of actual attribute box
+            const rightHandleX = item.left + attrRelativeRight // Right edge of actual attribute box
+
+            handles.push(
+              {
+                attrId: attr.id,
+                side: 'left' as const,
+                x: leftHandleX,
+                y: absoluteY,
+              },
+              {
+                attrId: attr.id,
+                side: 'right' as const,
+                x: rightHandleX,
+                y: absoluteY,
+              }
+            )
+          } else {
+            // FALLBACK: Mathematical approximation if DOM element not found
+            // This can happen during initial render or if attribute is filtered out
+            const headerHeight = 140 // Approximate: title + subtitle + filters + margins
+            const attributeRowHeight = 41 // Approximate row height
+            const index = allAttributes.indexOf(attr)
+            const relativeY = headerHeight + (index * attributeRowHeight) + (attributeRowHeight / 2)
+            const absoluteY = item.top + relativeY
+
+            // Anchors should align with attribute box edges
+            // TRUE SYMMETRIC: both sides with equal padding offset
+            const cardPadding = 16 // p-4 = 16px on all sides
+
+            handles.push(
+              {
+                attrId: attr.id,
+                side: 'left' as const,
+                x: item.left + cardPadding,
+                y: absoluteY,
+              },
+              {
+                attrId: attr.id,
+                side: 'right' as const,
+                x: item.left + cardWidth - cardPadding,
+                y: absoluteY,
+              }
+            )
+          }
+        })
+      }
+
+      onUpdateHandles(item.itemId, cardHeight, handles)
+    })
+
+    return () => cancelAnimationFrame(rafId)
+  }, [
+    item.itemId,
+    item.left,
+    item.top,
+    item.width,
+    item.collapsed,
+    item.attributeFilter,
+    item.itemType,
+    onUpdateHandles,
+    allEntities,
+    allSources,
+    allRequirements,
+  ])
+
   const displaySubtitle = () => {
     if (isEntity) {
       if (isEditingType) {
         return (
           <select
-            value={cardObjectType || ""}
+            value={cardStereotypeId || ""}
             onChange={(e) => {
               onUpdateObjectType(item.itemId, e.target.value)
               setIsEditingType(false)
@@ -470,9 +564,9 @@ export const DiagramCard = memo(function DiagramCard({
             onClick={(e) => e.stopPropagation()}
           >
             <option value="">Select type...</option>
-            {OBJECT_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
+            {(settings?.entityStereotypes || []).map((stereotype) => (
+              <option key={stereotype.id} value={stereotype.id}>
+                {stereotype.label}
               </option>
             ))}
           </select>
@@ -488,7 +582,7 @@ export const DiagramCard = memo(function DiagramCard({
           }}
           title="Double-click to edit object type"
         >
-          {cardObjectType || "<Object Type>"}
+          {getStereotypeLabel(cardStereotypeId, settings?.entityStereotypes)}
         </div>
       )
     }
@@ -496,7 +590,7 @@ export const DiagramCard = memo(function DiagramCard({
     return (
       <div className="text-xs text-gray-600">
         {data && ("stereotype" in data)
-          ? (data as any).stereotype
+          ? getStereotypeLabel((data as any).stereotype, settings?.entityStereotypes)
           : data && ("database" in data)
             ? `${(data as any).database}.${(data as any).schema}`
             : (data as any)?.description}
@@ -602,20 +696,21 @@ export const DiagramCard = memo(function DiagramCard({
     setShowAddForm(false)
   }
 
-  const cardObjectType = item.itemType === "entity" ? (item.objectType || ((data as any)?.stereotype as string) || "Object") : undefined
+  // Get stereotype ID from item or entity data
+  const cardStereotypeId = item.itemType === "entity" ? (item.objectType || ((data as any)?.stereotype as string) || "object") : undefined
 
   const getCardBackgroundColor = () => {
-    if (item.itemType === "entity" && cardObjectType) {
-      return OBJECT_TYPE_COLORS[cardObjectType] || "bg-white"
+    if (item.itemType === "entity" && cardStereotypeId) {
+      const colorClasses = getStereotypeColor(cardStereotypeId, settings?.entityStereotypes)
+      return colorClasses.split(" ")[0] || "bg-white"
     }
     return "bg-white"
   }
 
   const getBorderColor = () => {
-    if (item.itemType === "entity" && cardObjectType) {
-      // Extract border color from the object type colors
-      const colorClass = OBJECT_TYPE_COLORS[cardObjectType]
-      return colorClass ? colorClass.split(" ")[1] : "border-green-400"
+    if (item.itemType === "entity" && cardStereotypeId) {
+      const colorClasses = getStereotypeColor(cardStereotypeId, settings?.entityStereotypes)
+      return colorClasses.split(" ")[1] || "border-gray-300"
     }
     return item.itemType === "entity"
       ? "border-green-400"

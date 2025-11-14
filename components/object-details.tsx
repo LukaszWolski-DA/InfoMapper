@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { toast } from "sonner"
 import { useState, useMemo, useRef } from "react"
+import { useSettings } from "@/lib/use-settings"
+import { getStereotypeLabel } from "@/lib/utils"
 
 interface ObjectDetailsProps {
   selected: { type: "concept" | "entity" | "attribute"; id: string } | null
@@ -27,6 +29,7 @@ interface ObjectDetailsProps {
 }
 
 export function ObjectDetails({ selected, concepts, entities, attributes, onUpdateConcept, onDeleteConcept, onUpdateEntity, onDeleteEntity, onCreateAttribute, onRestoreAttribute, onUpdateAttribute, onDeleteAttribute }: ObjectDetailsProps) {
+  const settings = useSettings()
   const [entityViewMode, setEntityViewMode] = useState<"details" | "table">("details")
   const selectedEntityId = selected?.type === "entity" ? selected.id : null
   const entityAttributes = useMemo(() => {
@@ -178,16 +181,18 @@ export function ObjectDetails({ selected, concepts, entities, attributes, onUpda
             <div>
               <div className="text-xs text-gray-500">Stereotype</div>
               <div className="mt-1">
-                <Select value={e.stereotype || "Object"} onValueChange={(val) => onUpdateEntity(e.id, { stereotype: val })}>
+                <Select value={e.stereotype || "object"} onValueChange={(val) => onUpdateEntity(e.id, { stereotype: val })}>
                   <SelectTrigger size="sm" aria-label="Select stereotype" className="h-[var(--size-filter-height)] text-xs">
-                    <SelectValue />
+                    <SelectValue>
+                      {getStereotypeLabel(e.stereotype, settings?.entityStereotypes)}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Object">Object</SelectItem>
-                    <SelectItem value="Link">Link</SelectItem>
-                    <SelectItem value="Dictionary">Dictionary</SelectItem>
-                    <SelectItem value="Context">Context</SelectItem>
-                    <SelectItem value="Informative">Informative</SelectItem>
+                    {(settings?.entityStereotypes || []).map((stereotype) => (
+                      <SelectItem key={stereotype.id} value={stereotype.id}>
+                        {stereotype.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

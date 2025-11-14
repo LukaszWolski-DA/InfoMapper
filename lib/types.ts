@@ -36,6 +36,13 @@ export interface Attribute {
   tags?: string[] // Source column tags (for imported sources only)
 }
 
+export interface HandlePosition {
+  attrId: string // Attribute ID this handle corresponds to
+  side: 'left' | 'right' // Which side of the card this handle is on
+  x: number // Absolute X position on diagram
+  y: number // Absolute Y position on diagram
+}
+
 export interface DiagramItem {
   itemId: string
   itemType: "entity" | "source" | "requirement"
@@ -46,6 +53,8 @@ export interface DiagramItem {
   objectType?: string
   attributeFilter?: "all" | "mapped" | "unmapped" | "keys"
   width?: number // Added custom width property for resizable cards
+  height?: number // Card height calculated from content
+  handles?: HandlePosition[] // Connection handle positions for each attribute
   showOnlyMapped?: boolean // UI hint used in Mapping filters
   // Usunięto: customAttributes, attributeOverrides, hiddenAttributes
   // Atrybuty są teraz przechowywane tylko w LogicalAttribute[] w store

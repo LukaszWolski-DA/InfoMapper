@@ -31,7 +31,7 @@ export function deleteConcept(id: string): void {
 }
 
 export function addEntity(conceptId: string, name: string = "New Entity"): LogicalEntity {
-  const entity: LogicalEntity = { id: genLogicalEntityId(), conceptId, name, stereotype: "Object" }
+  const entity: LogicalEntity = { id: genLogicalEntityId(), conceptId, name, stereotype: "object" }
   setObjectState((prev) => ({
     ...prev,
     logicalEntities: [...prev.logicalEntities, entity],
@@ -216,6 +216,13 @@ export function deleteConnectionById(connectionId: string): void {
 
 export function clearConnections(): void {
   setObjectState((prev) => ({ ...prev, connections: [] }))
+}
+
+export function updateDiagramItemHandles(itemId: string, height: number, handles: import("./types").HandlePosition[]): void {
+  setObjectState((prev) => ({
+    ...prev,
+    items: prev.items.map((it) => (it.itemId === itemId ? { ...it, height, handles: [...handles] } : it)),
+  }))
 }
 
 // =============================

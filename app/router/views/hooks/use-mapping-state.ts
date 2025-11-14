@@ -60,10 +60,10 @@ export function useMappingState() {
       const state = getObjectState()
       const validatedItems = validateDiagramItems(state.items, state)
 
-      // If we filtered out invalid items, update the store to clean it up
+      // Don't modify the store here - just filter for display
+      // Modifying the store here would trigger an infinite loop
       if (validatedItems.length !== state.items.length) {
-        console.log(`[use-mapping-state] Cleaned ${state.items.length - validatedItems.length} invalid diagram items`)
-        setObjectState(prev => ({ ...prev, items: validatedItems }))
+        console.warn(`[use-mapping-state] Filtered out ${state.items.length - validatedItems.length} invalid diagram items`)
       }
 
       setDiagramItems(validatedItems)

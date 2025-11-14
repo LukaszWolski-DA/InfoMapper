@@ -36,6 +36,7 @@ interface DiagramAreaProps {
   onAddCustomAttribute: (itemId: string, attribute: Attribute) => void
   onUpdateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
   onDeleteAttribute: (itemId: string, attrId: string) => void
+  onUpdateHandles?: (itemId: string, height: number, handles: import("@/lib/types").HandlePosition[]) => void
   onAttributeEditStateChange?: () => void
   // Nowe: pełna lista encji (projekcja z Object) do wykorzystania na diagramie
   entities?: Entity[]
@@ -66,6 +67,7 @@ export function DiagramArea({
   onAddCustomAttribute,
   onUpdateAttribute,
   onDeleteAttribute,
+  onUpdateHandles,
   onAttributeEditStateChange,
   entities,
   customEntities,
@@ -240,6 +242,7 @@ export function DiagramArea({
             onAddCustomAttribute={onAddCustomAttribute}
             onUpdateAttribute={onUpdateAttribute}
             onDeleteAttribute={onDeleteAttribute}
+            onUpdateHandles={onUpdateHandles}
             onAttributeEditStateChange={onAttributeEditStateChange}
             allEntities={allEntities}
             allSources={allSources}
@@ -255,7 +258,14 @@ export function DiagramArea({
             return sourceItem?.hidden === false && targetItem?.hidden === false
           })
           .map((connection) => (
-            <ConnectionLine key={connection.id} connection={connection} onDelete={onDeleteConnection} zoom={zoom} positionUpdateCounter={positionUpdateCounter} collapseCounter={collapseCounter} filterUpdateCounter={filterUpdateCounter} editFormCounter={editFormCounter} activeView={activeView} />
+            <ConnectionLine
+              key={connection.id}
+              connection={connection}
+              onDelete={onDeleteConnection}
+              zoom={zoom}
+              diagramItems={diagramItems}
+              activeView={activeView}
+            />
           ))}
       </div>
     </div>

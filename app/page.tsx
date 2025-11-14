@@ -60,6 +60,7 @@ import { normalizeStereotype } from "@/lib/utils"
 import { toast } from "sonner"
 import { handleError, safeLocalStorage } from "@/lib/error-handler"
 import { useMappingState } from "@/app/router/views/hooks/use-mapping-state"
+import { useMappingActions } from "@/app/router/views/hooks/use-mapping-actions"
 
 const LOCAL_STORAGE_KEY = "infoMapperStateV1"
 
@@ -79,25 +80,16 @@ export default function InfoMapperPage() {
   const [modelDiagramItems, setModelDiagramItems] = useState<DiagramItem[]>([])
   const [modelRelationships, setModelRelationships] = useState<Relationship[]>([])
 
-  // Mapping view state - managed by custom hook
+  // Model view UI counters (for connection line updates in model view)
+  const [modelCollapseCounter, setModelCollapseCounter] = useState(0)
+  const [modelPositionUpdateCounter, setModelPositionUpdateCounter] = useState(0)
+
+  // Mapping view state - needed for projections and autosave
+  // Note: Actions are managed internally by mapping-view.tsx via hooks
   const {
     diagramItems,
     connections,
-    entityFilter,
-    sourceFilter,
-    requirementFilter,
-    selectedAttribute,
-    setEntityFilter,
-    setSourceFilter,
-    setRequirementFilter,
-    setSelectedAttribute,
   } = useMappingState()
-
-  // UI counters for Mapping view
-  const [positionUpdateCounter, setPositionUpdateCounter] = useState(0)
-  const [collapseCounter, setCollapseCounter] = useState(0)
-  const [filterUpdateCounter, setFilterUpdateCounter] = useState(0)
-  const [editFormCounter, setEditFormCounter] = useState(0)
 
   const [importedSources, setImportedSources] = useState<Source[]>([])
   const [sourcesRawData, setSourcesRawData] = useState<SourcesDomainData>({ systems: [], databases: [], schemas: [], objects: [] })
@@ -156,6 +148,26 @@ export default function InfoMapperPage() {
   // Note: diagramItems and connections are managed by useMappingState hook
   useEffect(() => {
     initObjectStateFromStorage()
+
+    // Data migration: Normalize stereotype values from labels to IDs
+    const state = getObjectState()
+    let needsUpdate = false
+    const updatedEntities = state.logicalEntities.map(entity => {
+      const normalizedStereotype = normalizeStereotype(entity.stereotype, state.settings.entityStereotypes)
+      if (entity.stereotype !== normalizedStereotype) {
+        needsUpdate = true
+        return { ...entity, stereotype: normalizedStereotype }
+      }
+      return entity
+    })
+
+    if (needsUpdate) {
+      setObjectState((prev) => ({
+        ...prev,
+        logicalEntities: updatedEntities
+      }))
+    }
+
     const unsub = subscribe(() => {
       const s = getObjectState()
       setConcepts(s.concepts)
@@ -234,42 +246,10 @@ export default function InfoMapperPage() {
     })
   }
 
-  const addItemToDiagram = (
-    itemId: string,
-    itemType: "entity" | "source" | "requirement",
-    left: number,
-    top: number,
-  ) => {
-    const exists = getObjectState().items.find((it) => it.itemId === itemId)
-    if (exists) {
-      if (exists.hidden) {
-        setObjectState((prev) => ({
-          ...prev,
-          items: prev.items.map((it) => (it.itemId === itemId ? { ...it, hidden: false } : it)),
-        }))
-      }
-      return
-    }
-    const newItem: DiagramItem = { itemId, itemType, left, top, hidden: false, collapsed: false, attributeFilter: "all", width: 200 }
-    cmdAddDiagramItem(newItem)
-  }
-
-  const hideItem = (itemId: string) => cmdHideDiagramItem(itemId)
-
-  const updateItemPosition = (itemId: string, left: number, top: number) => {
-    cmdUpdateDiagramItemPosition(itemId, left, top)
-    // Increment counter to trigger ConnectionLine updates
-    setPositionUpdateCounter(prev => prev + 1)
-  }
-
   const handleAttributeEditStateChange = useCallback(() => {
-    // Increment editFormCounter to trigger ConnectionLine cache invalidation when attribute edit forms open/close
-    setEditFormCounter(prev => prev + 1)
+    // Empty callback - edit form counter is now managed internally by mapping-view hooks
+    // This callback is kept for compatibility with the component interface
   }, [])
-
-  const addConnection = (connection: Connection) => cmdAddConnection(connection)
-
-  const deleteConnection = (connectionId: string) => cmdDeleteConnectionById(connectionId)
 
   const clearAllMappings = () => setObjectState((prev) => ({ ...prev, connections: [] })) // Clear all - nie ma dedykowanej komendy, ale to jest bulk operation
 
@@ -337,56 +317,9 @@ export default function InfoMapperPage() {
 
   const deleteLogicalAttribute = (id: string) => cmdDeleteAttribute(id)
 
-  const toggleItemCollapsed = (itemId: string) => {
-    cmdToggleDiagramItemCollapsed(itemId)
-    // Delay counter increment to allow CSS transition to complete
-    setTimeout(() => {
-      setCollapseCounter(prev => prev + 1) // Clears cache in ConnectionLine
-      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
-    }, 50) // Short delay for responsive feel
-  }
-
   const updateItemObjectType = (itemId: string, objectType: string) => cmdUpdateDiagramItemObjectType(itemId, objectType)
 
   const toggleShowOnlyMapped = (itemId: string) => cmdToggleDiagramItemShowOnlyMapped(itemId)
-
-  const setAttributeFilter = (itemId: string, filter: "all" | "mapped" | "unmapped" | "keys") => {
-    cmdSetDiagramItemAttributeFilter(itemId, filter)
-    // Delay counter increment to allow DOM to update (same pattern as collapse)
-    setTimeout(() => {
-      setFilterUpdateCounter(prev => prev + 1) // Clears cache in ConnectionLine
-      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
-    }, 50)
-  }
-
-  const updateItemWidth = (itemId: string, width: number) => cmdUpdateDiagramItemWidth(itemId, width)
-
-  const addCustomAttribute = (itemId: string, attribute: Attribute) => {
-    // Nowy system: dodaj atrybut bezpośrednio do modelu logicznego przez komendę
-    // Atrybuty będą automatycznie widoczne przez projekcję
-    upsertCardAttribute(itemId, attribute.id, {
-      name: attribute.name,
-      isPrimaryKey: attribute.isPrimaryKey,
-      isForeignKey: attribute.isForeignKey,
-      isPII: attribute.isPII,
-      dataType: attribute.dataType,
-    })
-  }
-
-  const updateAttribute = (itemId: string, attrId: string, updates: Partial<Attribute>) => {
-    const logicalUpdates: Partial<LogicalAttribute> = {}
-    if (updates.name) logicalUpdates.name = updates.name
-    if (Object.prototype.hasOwnProperty.call(updates, "isPrimaryKey")) logicalUpdates.isPrimaryKey = updates.isPrimaryKey
-    if (Object.prototype.hasOwnProperty.call(updates, "isForeignKey")) logicalUpdates.isForeignKey = updates.isForeignKey
-    if (Object.prototype.hasOwnProperty.call(updates, "isPII")) logicalUpdates.isPII = updates.isPII
-    if (updates.dataType) logicalUpdates.dataType = updates.dataType
-    
-    updateLogicalAttribute(attrId, logicalUpdates)
-  }
-
-  const deleteAttribute = (itemId: string, attrId: string) => {
-    deleteLogicalAttribute(attrId)
-  }
 
   const addCustomEntity = (name: string, objectType?: string) => {
     // Znajdź lub utwórz "Default Concept"
@@ -489,8 +422,8 @@ export default function InfoMapperPage() {
     cmdToggleModelItemCollapsed(itemId)
     // Delay counter increment to allow CSS transition to complete
     setTimeout(() => {
-      setCollapseCounter(prev => prev + 1) // Clears cache in ConnectionLine
-      setPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
+      setModelCollapseCounter(prev => prev + 1) // Clears cache in ConnectionLine
+      setModelPositionUpdateCounter(prev => prev + 1) // Triggers position recalculation
     }, 50) // Short delay for responsive feel
   }
 
@@ -680,10 +613,7 @@ export default function InfoMapperPage() {
   // Track visited views for lazy mounting
   useEffect(() => {
     setVisitedViews(prev => new Set([...prev, activeView]))
-    // Force connection position recalculation when returning to mapping view
-    if (activeView === 'mapping') {
-      setPositionUpdateCounter(prev => prev + 1)
-    }
+    // Note: Connection position recalculation for mapping view is now handled internally by hooks
   }, [activeView])
 
   return (
@@ -729,37 +659,12 @@ export default function InfoMapperPage() {
           updateModelAttribute={updateModelAttribute}
           deleteModelAttribute={deleteModelAttribute}
           // Requirements view
-          connections={connections}
-          // Mapping view
-          diagramItems={diagramItems}
-          positionUpdateCounter={positionUpdateCounter}
-          collapseCounter={collapseCounter}
-          filterUpdateCounter={filterUpdateCounter}
-          editFormCounter={editFormCounter}
-          selectedAttribute={selectedAttribute}
+          connections={getObjectState().connections}
+          // Mapping view (fully managed by hooks internally)
           importedSources={importedSources}
           requirementsForUi={requirementsForUi}
-          addItemToDiagram={addItemToDiagram}
-          hideItem={hideItem}
-          updateItemPosition={updateItemPosition}
           onAttributeEditStateChange={handleAttributeEditStateChange}
-          addConnection={addConnection}
-          deleteConnection={deleteConnection}
-          setSelectedAttribute={setSelectedAttribute}
-          toggleItemCollapsed={toggleItemCollapsed}
           updateItemObjectType={updateItemObjectType}
-          setAttributeFilter={setAttributeFilter}
-          updateItemWidth={updateItemWidth}
-          addCustomAttribute={addCustomAttribute}
-          updateAttribute={updateAttribute}
-          deleteAttribute={deleteAttribute}
-          // Mapping view - Sidebar props
-          entityFilter={entityFilter}
-          sourceFilter={sourceFilter}
-          requirementFilter={requirementFilter}
-          onEntityFilterChange={setEntityFilter}
-          onSourceFilterChange={setSourceFilter}
-          onRequirementFilterChange={setRequirementFilter}
           onAddCustomEntity={addCustomEntity}
           onAddCustomEntityWithConcept={addCustomEntityWithConcept}
           onAddCustomSource={addCustomSource}

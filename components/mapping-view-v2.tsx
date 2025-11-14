@@ -25,10 +25,6 @@ interface MappingViewV2Props {
   // DiagramArea props
   diagramItems: DiagramItem[]
   connections: Connection[]
-  positionUpdateCounter: number
-  collapseCounter: number
-  filterUpdateCounter: number
-  editFormCounter: number
   onAddItem: (itemId: string, itemType: 'entity' | 'source' | 'requirement', left: number, top: number) => void
   onHideItem: (itemId: string) => void
   onUpdatePosition: (itemId: string, left: number, top: number) => void
@@ -42,6 +38,7 @@ interface MappingViewV2Props {
   onAddCustomAttribute: (itemId: string, attribute: Attribute) => void
   onUpdateAttribute: (itemId: string, attrId: string, updates: Partial<Attribute>) => void
   onDeleteAttribute: (itemId: string, attrId: string) => void
+  onUpdateHandles?: (itemId: string, height: number, handles: import("@/lib/types").HandlePosition[]) => void
 
   // Sidebar props
   entityFilter: string
@@ -96,10 +93,6 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
     // DiagramArea props
     diagramItems,
     connections,
-    positionUpdateCounter,
-    collapseCounter,
-    filterUpdateCounter,
-    editFormCounter,
     onAddItem,
     onHideItem,
     onUpdatePosition,
@@ -113,6 +106,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
     onAddCustomAttribute,
     onUpdateAttribute,
     onDeleteAttribute,
+    onUpdateHandles,
     // Sidebar props
     entityFilter,
     sourceFilter,
@@ -165,10 +159,6 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
         <DiagramArea
           diagramItems={diagramItems}
           connections={connections}
-          positionUpdateCounter={positionUpdateCounter}
-          collapseCounter={collapseCounter}
-          filterUpdateCounter={filterUpdateCounter}
-          editFormCounter={editFormCounter}
           activeView="mapping"
           onAddItem={onAddItem}
           onHideItem={onHideItem}
@@ -185,6 +175,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
           onAddCustomAttribute={onAddCustomAttribute}
           onUpdateAttribute={onUpdateAttribute}
           onDeleteAttribute={onDeleteAttribute}
+          onUpdateHandles={onUpdateHandles}
           entities={projectedEntities}
           customSources={importedSources}
           customRequirements={requirementsForUi}
