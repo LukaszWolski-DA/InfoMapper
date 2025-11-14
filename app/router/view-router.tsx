@@ -102,6 +102,7 @@ interface ViewRouterProps {
   addItemToDiagram: (itemId: string, itemType: 'entity' | 'source' | 'requirement', left: number, top: number) => void
   hideItem: (itemId: string) => void
   updateItemPosition: (itemId: string, left: number, top: number) => void
+  onAttributeEditStateChange: () => void
   addConnection: (connection: Connection) => void
   deleteConnection: (connectionId: string) => void
   setSelectedAttribute: (
@@ -162,6 +163,7 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
           onAddItem={props.addItemToDiagram}
           onHideItem={props.hideItem}
           onUpdatePosition={props.updateItemPosition}
+          onAttributeEditStateChange={props.onAttributeEditStateChange}
           onAddConnection={props.addConnection}
           onDeleteConnection={props.deleteConnection}
           onToggleCollapsed={props.toggleItemCollapsed}

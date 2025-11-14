@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { TopNav } from "@/components/top-nav"
 import { ViewRouter, type ViewType } from "@/app/router/view-router"
 import { Sidebar } from "@/components/sidebar"
@@ -59,6 +59,7 @@ import { genLogicalEntityId, genConceptId, genDiagramItemId, genRequirementId } 
 import { normalizeStereotype } from "@/lib/utils"
 import { toast } from "sonner"
 import { handleError, safeLocalStorage } from "@/lib/error-handler"
+import { useMappingState } from "@/app/router/views/hooks/use-mapping-state"
 
 const LOCAL_STORAGE_KEY = "infoMapperStateV1"
 
@@ -78,21 +79,25 @@ export default function InfoMapperPage() {
   const [modelDiagramItems, setModelDiagramItems] = useState<DiagramItem[]>([])
   const [modelRelationships, setModelRelationships] = useState<Relationship[]>([])
 
-  const [diagramItems, setDiagramItems] = useState<DiagramItem[]>(getObjectState().items)
-  const [connections, setConnections] = useState<Connection[]>(getObjectState().connections)
+  // Mapping view state - managed by custom hook
+  const {
+    diagramItems,
+    connections,
+    entityFilter,
+    sourceFilter,
+    requirementFilter,
+    selectedAttribute,
+    setEntityFilter,
+    setSourceFilter,
+    setRequirementFilter,
+    setSelectedAttribute,
+  } = useMappingState()
+
+  // UI counters for Mapping view
   const [positionUpdateCounter, setPositionUpdateCounter] = useState(0)
   const [collapseCounter, setCollapseCounter] = useState(0)
   const [filterUpdateCounter, setFilterUpdateCounter] = useState(0)
   const [editFormCounter, setEditFormCounter] = useState(0)
-  const [entityFilter, setEntityFilter] = useState("")
-  const [sourceFilter, setSourceFilter] = useState("")
-  const [requirementFilter, setRequirementFilter] = useState("")
-  const [selectedAttribute, setSelectedAttribute] = useState<{
-    itemId: string
-    itemType: "entity" | "source" | "requirement"
-    attrId: string
-    attrName: string
-  } | null>(null)
 
   const [importedSources, setImportedSources] = useState<Source[]>([])
   const [sourcesRawData, setSourcesRawData] = useState<SourcesDomainData>({ systems: [], databases: [], schemas: [], objects: [] })
@@ -148,6 +153,7 @@ export default function InfoMapperPage() {
   )
 
   // Init store from storage and subscribe UI to store changes (Object domain)
+  // Note: diagramItems and connections are managed by useMappingState hook
   useEffect(() => {
     initObjectStateFromStorage()
     const unsub = subscribe(() => {
@@ -155,8 +161,6 @@ export default function InfoMapperPage() {
       setConcepts(s.concepts)
       setLogicalEntities(s.logicalEntities)
       setLogicalAttributes(s.logicalAttributes)
-      setDiagramItems(s.items)
-      setConnections(s.connections)
       setModelDiagramItems(s.modelItems)
       setModelRelationships(s.modelRelationships)
       setStoreRequirements((s.requirements as any) || [])
@@ -257,6 +261,11 @@ export default function InfoMapperPage() {
     // Increment counter to trigger ConnectionLine updates
     setPositionUpdateCounter(prev => prev + 1)
   }
+
+  const handleAttributeEditStateChange = useCallback(() => {
+    // Increment editFormCounter to trigger ConnectionLine cache invalidation when attribute edit forms open/close
+    setEditFormCounter(prev => prev + 1)
+  }, [])
 
   const addConnection = (connection: Connection) => cmdAddConnection(connection)
 
@@ -530,17 +539,26 @@ export default function InfoMapperPage() {
       const normModelItems = (parsed.modelItems || []).map((it) => {
         return it.itemType === "entity" ? { ...it, objectType: normalizeStereotype(it.objectType as string, currentSettings.entityStereotypes) } : it
       }) as unknown as DiagramItem[]
-      setDiagramItems(normItems)
-      setConnections(parsed.connections)
+
+      // Load all state to store (including diagramItems and connections)
+      setObjectState(prev => ({
+        ...prev,
+        items: normItems,
+        connections: parsed.connections,
+        modelItems: normModelItems,
+        modelRelationships: parsed.modelRelationships as Relationship[],
+        concepts: parsed.concepts,
+        logicalEntities: parsed.logicalEntities,
+        logicalAttributes: parsed.logicalAttributes,
+        requirements: (parsed.requirements && Array.isArray(parsed.requirements)) ? parsed.requirements as any : prev.requirements,
+      }))
+
+      // Update local state for non-mapping views
       setModelDiagramItems(normModelItems)
       setModelRelationships(parsed.modelRelationships as Relationship[])
       setConcepts(parsed.concepts)
       setLogicalEntities(parsed.logicalEntities)
       setLogicalAttributes(parsed.logicalAttributes)
-      // Załaduj requirements do store
-      if (parsed.requirements && Array.isArray(parsed.requirements)) {
-        setObjectState(prev => ({ ...prev, requirements: parsed.requirements as any }))
-      }
     } catch (e) {
       handleError({
         context: 'state-management',
@@ -599,7 +617,7 @@ export default function InfoMapperPage() {
     const handler = (e: Event) => {
       const { section, payload } = (e as CustomEvent).detail || {}
       if (typeof section === "string") {
-        setActiveSection(section)
+        setActiveView(section as ViewType)
       }
       // Optionally: could set selection in Object/Mapping based on payload
     }
@@ -724,6 +742,7 @@ export default function InfoMapperPage() {
           addItemToDiagram={addItemToDiagram}
           hideItem={hideItem}
           updateItemPosition={updateItemPosition}
+          onAttributeEditStateChange={handleAttributeEditStateChange}
           addConnection={addConnection}
           deleteConnection={deleteConnection}
           setSelectedAttribute={setSelectedAttribute}

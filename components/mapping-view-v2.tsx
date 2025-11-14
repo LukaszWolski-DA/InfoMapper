@@ -32,6 +32,7 @@ interface MappingViewV2Props {
   onAddItem: (itemId: string, itemType: 'entity' | 'source' | 'requirement', left: number, top: number) => void
   onHideItem: (itemId: string) => void
   onUpdatePosition: (itemId: string, left: number, top: number) => void
+  onAttributeEditStateChange: () => void
   onAddConnection: (connection: Connection) => void
   onDeleteConnection: (connectionId: string) => void
   onToggleCollapsed: (itemId: string) => void
@@ -102,6 +103,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
     onAddItem,
     onHideItem,
     onUpdatePosition,
+    onAttributeEditStateChange,
     onAddConnection,
     onDeleteConnection,
     onToggleCollapsed,
@@ -171,6 +173,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
           onAddItem={onAddItem}
           onHideItem={onHideItem}
           onUpdatePosition={onUpdatePosition}
+          onAttributeEditStateChange={onAttributeEditStateChange}
           onAddConnection={onAddConnection}
           onDeleteConnection={onDeleteConnection}
           searchQuery=""
