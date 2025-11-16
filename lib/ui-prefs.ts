@@ -15,6 +15,7 @@ export type ObjectTreePrefs = {
 export type ModelTreePrefs = {
   leftPanelWidth?: number
   isLeftPanelVisible?: boolean
+  openConceptIds?: string[]
 }
 
 export type SourcesTreePrefs = {
@@ -26,10 +27,23 @@ export type SourcesTreePrefs = {
   openObjectIds?: string[]
 }
 
+export type MappingSidebarPrefs = {
+  sidebarWidth?: number
+  openConceptIds?: string[]
+  openEntityIds?: string[]
+}
+
+export type RequirementsViewPrefs = {
+  isFilterPanelVisible?: boolean
+  isEntityFilterVisible?: boolean
+}
+
 type UIPrefs = {
   objectTree?: ObjectTreePrefs
   modelTree?: ModelTreePrefs
   sourcesTree?: SourcesTreePrefs
+  mappingSidebar?: MappingSidebarPrefs
+  requirementsView?: RequirementsViewPrefs
 }
 
 export function getUIPrefs(): UIPrefs {
@@ -99,6 +113,30 @@ export function setSourcesTreePrefs(prefs: Partial<SourcesTreePrefs>): void {
   setUIPrefs({
     ...existing,
     sourcesTree: { ...existing.sourcesTree, ...prefs },
+  })
+}
+
+export function getMappingSidebarPrefs(): MappingSidebarPrefs {
+  return getUIPrefs().mappingSidebar || {}
+}
+
+export function setMappingSidebarPrefs(prefs: Partial<MappingSidebarPrefs>): void {
+  const existing = getUIPrefs()
+  setUIPrefs({
+    ...existing,
+    mappingSidebar: { ...existing.mappingSidebar, ...prefs },
+  })
+}
+
+export function getRequirementsViewPrefs(): RequirementsViewPrefs {
+  return getUIPrefs().requirementsView || {}
+}
+
+export function setRequirementsViewPrefs(prefs: Partial<RequirementsViewPrefs>): void {
+  const existing = getUIPrefs()
+  setUIPrefs({
+    ...existing,
+    requirementsView: { ...existing.requirementsView, ...prefs },
   })
 }
 

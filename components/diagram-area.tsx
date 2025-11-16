@@ -43,6 +43,7 @@ interface DiagramAreaProps {
   customEntities?: Entity[]
   customSources: Source[]
   customRequirements: Requirement[]
+  onOpenRequirementEdit?: (requirement: Requirement | null) => void
 }
 
 export function DiagramArea({
@@ -73,6 +74,7 @@ export function DiagramArea({
   customEntities,
   customSources,
   customRequirements,
+  onOpenRequirementEdit,
 }: DiagramAreaProps) {
   const diagramRef = useRef<HTMLDivElement>(null)
   const GRID_SIZE = 16
@@ -248,6 +250,7 @@ export function DiagramArea({
             allSources={allSources}
             allRequirements={allRequirements}
             zoom={zoom}
+            onOpenRequirementEdit={onOpenRequirementEdit}
           />
         ))}
 

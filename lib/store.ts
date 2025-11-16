@@ -1,14 +1,6 @@
-import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig } from "./types"
+import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig, Requirement } from "./types"
 import { handleError, safeLocalStorage, safeJSONParse, safeJSONStringify } from "./error-handler"
 import { getDefaultSettings } from "./default-settings"
-
-type RequirementRow = {
-  id: string
-  name: string
-  description?: string
-  type?: "Functional" | "Non-functional" | "Other"
-  displayId: number
-}
 
 export type SettingsConfig = {
   entityStereotypes: EntityStereotypeConfig[]
@@ -19,8 +11,8 @@ type GlobalState = {
   concepts: Concept[]
   logicalEntities: LogicalEntity[]
   logicalAttributes: LogicalAttribute[]
-  // Requirements domain (UI shape used by RequirementsView)
-  requirements: RequirementRow[]
+  // Requirements domain
+  requirements: Requirement[]
   // Mapping domain
   items: DiagramItem[]
   connections: Connection[]

@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ImInput } from "@/components/ui/im-input"
 import { ImButton } from "@/components/ui/im-button"
 import { toast } from "sonner"
+import { getStereotypeLabel } from "@/lib/utils"
+import { useSettings } from "@/lib/use-settings"
 
 interface ObjectTreeProps {
   concepts: Concept[]
@@ -43,11 +45,11 @@ interface ObjectTreeProps {
   setFilterOnlyIssues?: (value: boolean) => void
 }
 
-export function ObjectTree({ 
-  concepts, entities, attributes, selected, onSelect, 
-  openConceptIds, openEntityIds, onToggleConcept, onToggleEntity, 
-  onCreateEntity, onUpdateConcept, onDeleteConcept, onUpdateEntity, onDeleteEntity, 
-  onCreateAttribute, onUpdateAttribute, onExpandOnlyConcept, 
+export function ObjectTree({
+  concepts, entities, attributes, selected, onSelect,
+  openConceptIds, openEntityIds, onToggleConcept, onToggleEntity,
+  onCreateEntity, onUpdateConcept, onDeleteConcept, onUpdateEntity, onDeleteEntity,
+  onCreateAttribute, onUpdateAttribute, onExpandOnlyConcept,
   isLeftPanelVisible, onToggleLeftPanelVisible,
   // Controlled props (can be passed from parent)
   query: controlledQuery, setQuery: controlledSetQuery,
@@ -55,6 +57,7 @@ export function ObjectTree({
   filterHasPii: controlledFilterHasPii, setFilterHasPii: controlledSetFilterHasPii,
   filterOnlyIssues: controlledFilterOnlyIssues, setFilterOnlyIssues: controlledSetFilterOnlyIssues
 }: ObjectTreeProps) {
+  const settings = useSettings()
   // Use controlled values if provided, otherwise use internal state
   const [internalQuery, internalSetQuery] = useState("")
   const [internalFilterHasPk, internalSetFilterHasPk] = useState(false)
@@ -470,7 +473,7 @@ export function ObjectTree({
                               >
                                 <span className="text-gray-900 font-semibold text-xs">{e.name}</span>
                                 {e.stereotype && (
-                                  <span className="ml-2 text-[11px] text-gray-500">{e.stereotype}</span>
+                                  <span className="ml-2 text-[11px] text-gray-500">{getStereotypeLabel(e.stereotype, settings?.entityStereotypes)}</span>
                                 )}
                               </button>
                             )}

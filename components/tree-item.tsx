@@ -4,6 +4,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { ChevronRight, ChevronDown } from "lucide-react"
 import type { Entity, Source, Requirement, DiagramItem } from "@/lib/types"
+import { normalizeStereotype, getStereotypeLabel } from "@/lib/utils"
+import { useSettings } from "@/lib/use-settings"
 
 interface TreeItemProps {
   item: Entity | Source | Requirement
@@ -13,6 +15,7 @@ interface TreeItemProps {
 }
 
 export function TreeItem({ item, type, searchQuery, diagramItems }: TreeItemProps) {
+  const settings = useSettings()
   const [collapsed, setCollapsed] = useState(true)
   const prevSearchQuery = useRef(searchQuery)
 
@@ -46,17 +49,8 @@ export function TreeItem({ item, type, searchQuery, diagramItems }: TreeItemProp
   const itemName = "name" in item ? item.name : "table" in item ? item.table : ""
 
   const diagramItem = diagramItems.find((di) => di.itemId === item.id && di.itemType === type)
-  const normalizeStereotype = (val?: string) => {
-    const allowed = ["Object", "Link", "Dictionary", "Context", "Informative"]
-    if (!val) return ""
-    const n = val.trim()
-    if (allowed.includes(n)) return n
-    // map common legacy values to Object
-    const legacy = ["Entity", "Aggregate", "Dimension", "Fact"]
-    if (legacy.includes(n)) return "Object"
-    return "Object"
-  }
-  const displayType = normalizeStereotype(diagramItem?.objectType || ("stereotype" in item ? (item as any).stereotype : ""))
+  const stereotypeId = normalizeStereotype(diagramItem?.objectType || ("stereotype" in item ? (item as any).stereotype : ""), settings?.entityStereotypes)
+  const displayType = getStereotypeLabel(stereotypeId, settings?.entityStereotypes)
 
   const matchesItem = !query || itemName.toLowerCase().includes(query)
   const matchesStereotype = !query || displayType.toLowerCase().includes(query)

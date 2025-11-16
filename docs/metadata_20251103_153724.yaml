@@ -1,0 +1,2296 @@
+dataSources:
+  - name: ASCOM
+    externalID: ""
+    physicalObjects:
+      - name: EFAFILE.PLFR360PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char
+          - name: IDTYPOSW
+            externalID: ""
+            dataType: int
+          - name: TYPOSW
+            externalID: ""
+            dataType: char
+      - name: EFLFILE.PLFR300PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDGRPROLI
+            externalID: ""
+            dataType: decimal(2,0)
+          - name: RLIDTYP
+            externalID: ""
+            dataType: decimal(2,0)
+          - name: RLNAZANG
+            externalID: ""
+            dataType: char(20)
+          - name: RLNAZWA
+            externalID: ""
+            dataType: char(20)
+          - name: RLSKROT
+            externalID: ""
+            dataType: char(2)
+      - name: EFLFILE.PLFR304PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDTYPOSPOW
+            externalID: ""
+            dataType: decimal(2,0)
+          - name: TYPOSPOW
+            externalID: ""
+            dataType: char(35)
+      - name: EFLFILE.PLFR324PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDTYPZNACZ
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDWARZNACZ
+            externalID: ""
+            dataType: char (10)(3)
+          - name: WARZNACZ
+            externalID: ""
+            dataType: char (100)(35)
+      - name: EFLFILE.PLFR325PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDTYPZNACZ
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: MODYF
+            externalID: ""
+            dataType: char (1)
+          - name: TYPZNACZ
+            externalID: ""
+            dataType: char(35)
+      - name: EFLFILE.PLFR326PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDTYPSEKA
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDWARSEG
+            externalID: ""
+            dataType: char(5)
+          - name: WARSEG
+            externalID: ""
+            dataType: char(35)
+      - name: EFLFILE.PLFR327PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDTYPSEKA
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: TYPSEKA
+            externalID: ""
+            dataType: char(35)
+      - name: EFLFILE.PLFR339PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: FRMPRW
+            externalID: ""
+            dataType: char(35)
+          - name: IDFRMPRW
+            externalID: ""
+            dataType: decimal(3,0)
+      - name: EFLFILE.PLFR359PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char
+          - name: IDTYPOSW
+            externalID: ""
+            dataType: int
+          - name: TYPOSW
+            externalID: ""
+            dataType: char
+      - name: EFLFILE.PLFR360PF
+        externalID: ""
+        columns:
+          - name: IDTYPOSW
+            externalID: ""
+            dataType: int
+      - name: EFLFILE.PLFR362PF
+        externalID: ""
+        columns:
+          - name: AKTYWNY
+            externalID: ""
+            dataType: char(1)
+          - name: IDOSWZRODL
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: OPISZRODL
+            externalID: ""
+            dataType: char(50)
+          - name: GUID
+            externalID: ""
+            dataType: decimal(24,0)
+      - name: EFLFILE.PLFR400PF
+        externalID: ""
+        columns:
+          - name: GUID
+            externalID: ""
+            dataType: decimal(24,0)
+          - name: IDFRMPRW
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: KHNAZSKR
+            externalID: ""
+            dataType: char(10)
+          - name: KHNIP
+            externalID: ""
+            dataType: char(15)
+          - name: KHREGON
+            externalID: ""
+            dataType: char(14)
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+      - name: EFLFILE.PLFR401PF
+        externalID: ""
+        columns:
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDROL
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDTYPROL
+            externalID: ""
+            dataType: decimal(2,0)
+      - name: EFLFILE.PLFR403PF
+        externalID: ""
+        columns:
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: DATAZM
+            externalID: ""
+            dataType: timestamp
+      - name: EFLFILE.PLFR409APF
+        externalID: ""
+        columns:
+          - name: DATAZM
+            externalID: ""
+            dataType: timestamp
+          - name: DODINFORM
+            externalID: ""
+            dataType: char(50)
+          - name: IDOSOB
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDOSW
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDOSWZRODL
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDTYPOSW
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: JRCHG
+            externalID: ""
+            dataType: char(1)
+          - name: JRID
+            externalID: ""
+            dataType: decimal(24,0)
+          - name: UZYTZM
+            externalID: ""
+            dataType: char(10)
+          - name: WARTOSW
+            externalID: ""
+            dataType: char(1)
+          - name: WAZNEDO
+            externalID: ""
+            dataType: decimal(7,0)
+          - name: WAZNEOD
+            externalID: ""
+            dataType: decimal(7,0)
+          - name: DATAZM
+            externalID: ""
+            dataType: timestamp
+      - name: EFLFILE.PLFR411APF
+        externalID: ""
+        columns:
+          - name: DATAZM
+            externalID: ""
+            dataType: timestamp
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDSEGM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDTYPSEKA
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDWARSEG
+            externalID: ""
+            dataType: char(5)
+          - name: JRID
+            externalID: ""
+            dataType: decimal(24,0)
+          - name: UZYTZM
+            externalID: ""
+            dataType: char(10)
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+      - name: EFLFILE.PLFR416PF
+        externalID: ""
+        columns:
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDROL
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDTYPZNACZ
+            externalID: ""
+            dataType: decimal(3,0)
+          - name: IDWARZNACZ
+            externalID: ""
+            dataType: char(10)
+      - name: EFLFILE.PLFR426PF
+        externalID: ""
+        columns:
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDROL
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: IDTYPOSPOW
+            externalID: ""
+            dataType: decimal(2,0)
+      - name: EFLFILE.PLFR428PF
+        externalID: ""
+        columns:
+          - name: FIRMID
+            externalID: ""
+            dataType: decimal(7,0)
+          - name: IDROL
+            externalID: ""
+            dataType: decimal(9,0)
+      - name: EFLFILE.PLFR435PF
+        externalID: ""
+        columns:
+          - name: DATAZM
+            externalID: ""
+            dataType: timestamp
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+          - name: JRID
+            externalID: ""
+            dataType: decimal(24,0)
+          - name: UZYTZM
+            externalID: ""
+            dataType: char(10)
+      - name: EFLFILE.PLFR503PF
+        externalID: ""
+        columns:
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+      - name: MDEFLFILE.PLFR393PF
+        externalID: ""
+        columns:
+          - name: IDTYPOSW
+            externalID: ""
+            dataType: decimal(3,0)
+  - name: ASEFA
+    externalID: ""
+    physicalObjects:
+      - name: MDEFAFILE.PLFM119PF ekspozycja, DPD i DEF_OVER
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: MDEFAFILE.PLFM129PF Forberance
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+  - name: ASEFL
+    externalID: ""
+    physicalObjects:
+      - name: EFLFILE.PLFM03APF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: EFLFILE.PLFM67PF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: EFLFILE.PLFM69PF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: EFLFILE.PLFM76PF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: EFLFILE.PLFM79PF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: EFLFILE.RODOANONIM
+        externalID: ""
+        columns:
+          - name: DATAANONIM
+            externalID: ""
+            dataType: char(8)
+          - name: IDPODM
+            externalID: ""
+            dataType: decimal(9,0)
+      - name: MDEFLFILE.PLFM76PF
+        externalID: ""
+        columns:
+          - name: NIPNUM
+            externalID: ""
+            dataType: decimal(10,0)
+  - name: BPM_DTA
+    externalID: ""
+    physicalObjects:
+      - name: BPM8.MIS_CM_CustomerData
+        externalID: ""
+        columns:
+          - name: customerFirmId
+            externalID: ""
+            dataType: nvarchar(64)
+          - name: ExternalId
+            externalID: ""
+            dataType: nvarchar(255)
+  - name: LFO
+    externalID: ""
+    physicalObjects:
+      - name: dbo.Contractor
+        externalID: ""
+        columns:
+          - name: ExternalId
+            externalID: ""
+            dataType: nvarchar(255)
+          - name: Id
+            externalID: ""
+            dataType: bigint
+  - name: PS
+    externalID: ""
+    physicalObjects:
+      - name: dbo.PS_E_DOD_DANE_KL
+        externalID: ""
+        columns:
+          - name: BO_ID
+            externalID: ""
+            dataType: decimal(31,0)
+          - name: E_GUID
+            externalID: ""
+            dataType: decimal(24,0)
+          - name: E_PROW_BO_ID
+            externalID: ""
+            dataType: decimal(31,0)
+  - name: REF_DATA
+    externalID: ""
+    physicalObjects:
+      - name: REF_DATA.CapitalGroupMember_REF
+        externalID: ""
+        columns:
+          - name: TaxIdentificationNumber
+            externalID: ""
+            dataType: varchar(200)
+      - name: REF_DATA.CustomerCentralRegister
+        externalID: ""
+        columns:
+          - name: TaxIdentificationNumber
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: REF_DATA.IndividualRestructuring_REF
+        externalID: ""
+        columns:
+          - name: PartyID
+            externalID: ""
+            dataType: decimal(10,0)
+      - name: REF_DATA.SmallCompanyRestructuring_REF
+        externalID: ""
+        columns:
+          - name: PartyID
+            externalID: ""
+            dataType: decimal(10,0)
+  - name: RISK
+    externalID: ""
+    physicalObjects:
+      - name: clientscoring.ClientData_H
+        externalID: ""
+        columns:
+          - name: Nip
+            externalID: ""
+            dataType: varchar(10)
+  - name: RISK_RM
+    externalID: ""
+    physicalObjects:
+      - name: riskmargin.ValuableParty
+        externalID: ""
+        columns:
+          - name: ValuableTaxIdentificationNumber
+            externalID: ""
+            dataType: varchar(15)
+  - name: TETAFK
+    externalID: ""
+    physicalObjects:
+      - name: dbo.TETAFK_BOBOOKINGS
+        externalID: ""
+        columns:
+          - name: EWZA_KONTRAHENT_ROLA
+            externalID: ""
+            dataType: varchar
+          - name: ID_CITIS_KLIENT
+            externalID: ""
+            dataType: varchar(200)
+          - name: ID_CITIS_KONTRAHENT
+            externalID: ""
+            dataType: unknown
+      - name: dbo.TETAFK_BOOKINGS
+        externalID: ""
+        columns:
+          - name: EWZA_KONTRAHENT_ROLA
+            externalID: ""
+            dataType: varchar
+          - name: ID_CITIS_KLIENT
+            externalID: ""
+            dataType: varchar(200)
+          - name: ID_CITIS_KONTRAHENT
+            externalID: ""
+            dataType: unknown
+
+logicalObjects:
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: Party
+    externalID: ""
+    objectType: MISDWH_Object
+    deployedToProd: true
+    columns:
+      - name: AnonymizationDate
+        externalID: ""
+        dataType: Date
+        definition: "Data anonimizacji danych"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.RODOANONIM.DATAANONIM
+            isGoldenSource: true
+      - name: FK_PartyId_SameAs
+        externalID: ""
+        dataType: numeric(24)
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR401PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR428PF.FIRMID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.LFO.dbo.Contractor.ExternalId
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.PS.dbo.PS_E_DOD_DANE_KL.E_GUID
+            isGoldenSource: true
+      - name: FK_PartyLegalFormId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator formy prawnej"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+      - name: FK_PKDCode
+        externalID: ""
+        dataType: varchar
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+      - name: IsOnSanctionsList
+        externalID: ""
+        dataType: boolean
+        definition: "Oznaczenie czy dany podmiot znajduje się na listach sankcyjnych"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDWARZNACZ
+            isGoldenSource: true
+      - name: PartyGUID
+        externalID: ""
+        dataType: numeric(24)
+        definition: "Globalny unikalny identyfikator kontrahenta w systemie"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.GUID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.LFO.dbo.Contractor.ExternalId
+          - mappingID: ""
+            source: DataSources.PS.dbo.PS_E_DOD_DANE_KL.E_GUID
+          - mappingID: ""
+            source: DataSources.PS.PS.PS_E_OFE_PROWIZJE.E_GUID
+            isGoldenSource: true
+      - name: PartyId
+        externalID: ""
+        dataType: numeric(24)
+        definition: "Indywidualny kod kontrahenta nadany w systemie"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.GUID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR401PF.IDPODM
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR401PF.IDROL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR403PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR426PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR428PF.IDROL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR503PF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM67PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM76PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.RODOANONIM.IDPODM
+          - mappingID: ""
+            source: DataSources.BPM_DTA.BPM8.MIS_CM_CustomerData.customerFirmId
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.LFO.dbo.Contractor.Id
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.PS.dbo.PS_E_DOD_DANE_KL.BO_ID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.PS.PS.PS_E_OFE_PROWIZJE.E_PROW_BO_ID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.REF_DATA.REF_DATA.IndividualRestructuring_REF.PartyID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.REF_DATA.REF_DATA.SmallCompanyRestructuring_REF.PartyID
+            isGoldenSource: true
+      - name: PartyName
+        externalID: ""
+        dataType: varchar(140)
+        definition: "Nazwa własna kontrahenta używana do jego identyfikacji: - w przypadku firm jest to nazwa firmy nadana podczas rejestracji - dla osób prywatnych nazwą jest połączenie imienia oraz nazwiska"
+        isPII: false
+        columnType: Info
+        isBusinessKey: false
+      - name: ResidentOfPL
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik określający czy kontrahent jest rezydentem RP "
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+      - name: ShortPartyName
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Skrócona nazwa kontrahenta"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.KHNAZSKR
+            isGoldenSource: true
+      - name: StatisticalIdentificationNumber
+        externalID: ""
+        dataType: varchar(15)
+        definition: "Unikalny identyfikator nadawany podmiotom gospodarki narodowej i jednostkom lokalnym tych podmiotów. Służy do celów ewidencyjnych i statystycznych, umożliwiając monitorowanie działalności gospodarczej i zbieranie danych dotyczących rynku"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.KHREGON
+            isGoldenSource: true
+      - name: TaxIdentificationNumber
+        externalID: ""
+        dataType: varchar(15)
+        definition: "Numer Identyfikacji Podatnika dla kontrahentów. Numer NIP występuje zarówno dla firm jak i osób prywatnych, w przypadkach gdy osoba nie posiada NIP będzie to nr PESEL bez ostatniej cyfry wprowadzony w AS400 jako NIP."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.KHNIP
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.RISK.clientscoring.ClientData_H.Nip
+      - name: WhetherBankruptcy
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik określający, czy dany kontrahent jest w upadłości."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyLegalForm
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartyTypeOfLegalFormActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik, czy forma prawna jest aktywna/aktualna"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR339PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartyLegalFormId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator formy prawnej"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR339PF.IDFRMPRW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR400PF.IDFRMPRW
+            isGoldenSource: true
+      - name: PartyTypeOfLegalForm
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Nazwa formy prawnej"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR339PF.FRMPRW
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyPersonBindingType
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartyPersonBindingTypeActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy rekord aktywny"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR304PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartyPersonBindingType
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Typ powiązań osób"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR304PF.TYPOSPOW
+            isGoldenSource: true
+      - name: PartyPersonBindingTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu powiązań osób"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR304PF.IDTYPOSPOW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR426PF.IDTYPOSPOW
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyRole
+    externalID: ""
+    objectType: MISDWH_Object
+    deployedToProd: true
+    columns:
+      - name: FK_PartyId
+        externalID: ""
+        dataType: int
+        definition: "Indywidualny kod kontrahenta nadany w systemie"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+      - name: FK_RoleTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu roli"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+      - name: RoleId
+        externalID: ""
+        dataType: int
+        definition: "Id roli kontrahenta pośród dostępnych typów roli, jak Dostawca, Dostawca kosztowy, Klient leasingowy, Klient inny itp."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR401PF.IDROL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDROL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR426PF.IDROL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR428PF.IDROL
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOBOOKINGS.ID_CITIS_KLIENT
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOBOOKINGS.ID_CITIS_KONTRAHENT
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOOKINGS.ID_CITIS_KLIENT
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOOKINGS.ID_CITIS_KONTRAHENT
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyRoleType
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: GroupRoleId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator grupy roli "
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.IDGRPROLI
+            isGoldenSource: true
+      - name: IsRoleActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy rola jest aktywna/aktualna"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.AKTYWNY
+            isGoldenSource: true
+      - name: RoleType
+        externalID: ""
+        dataType: varchar(20)
+        definition: "Nazwa typu roli - zgrupowanie ról do klienta lub dostawcy"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.RLNAZWA
+            isGoldenSource: true
+      - name: RoleTypeCode
+        externalID: ""
+        dataType: varchar(2)
+        definition: "Skrót nazwy typu roli"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.RLSKROT
+            isGoldenSource: true
+      - name: RoleTypeGroupDesc
+        externalID: ""
+        dataType: varchar(20)
+        definition: "Nazwa angielska typu roli - zgrupowanie ról do klienta lub dostawcy"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.RLNAZANG
+            isGoldenSource: true
+      - name: RoleTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu roli"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR300PF.RLIDTYP
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR401PF.IDTYPROL
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOBOOKINGS.EWZA_KONTRAHENT_ROLA
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.TETAFK.dbo.TETAFK_BOOKINGS.EWZA_KONTRAHENT_ROLA
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartySegmentType
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartySegmentTypeValueActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik określający czy wartość segmentu kontrahenta jest aktywna."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR327PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartySegment
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Typ segmentu kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR327PF.TYPSEKA
+            isGoldenSource: true
+      - name: PartySegmentTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator segmentu kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR327PF.IDTYPSEKA
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartySegmentTypeValue
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: FK_PartySegmentTypeId
+        externalID: ""
+        dataType: numeric(3,0)
+        definition: "Identyfikator segmentu kontrahenta."
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR326PF.IDTYPSEKA
+            isGoldenSource: true
+      - name: IsPartySegmentTypeValueActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik określający czy wartość segmentu kontrahenta jest aktywna."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR326PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartySegmentTypeValue
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Wartość segmentu kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR326PF.WARSEG
+            isGoldenSource: true
+      - name: PartySegmentTypeValueCode
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Identyfikator wartości segmentu kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR326PF.IDWARSEG
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyStatement
+    externalID: ""
+    objectType: MISDWH_Link
+    deployedToProd: true
+    columns:
+      - name: FK_PartyId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDPODM
+            isGoldenSource: true
+      - name: FK_PartyStatementSourceId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR362PF.IDOSWZRODL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDOSWZRODL
+            isGoldenSource: true
+      - name: FK_PartyStatementTypeId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFAFILE.PLFR360PF.IDTYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR359PF.IDTYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDTYPOSW
+            isGoldenSource: true
+      - name: FK_PersonId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDOSOB
+            isGoldenSource: true
+      - name: IsLastAvailablePartyStatement
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik wskazujący, który rekord dziennika oświadczeń był zmieniany ostatnio."
+        isPII: false
+        columnType: Info
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.DATAZM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDOSW
+            isGoldenSource: true
+      - name: PartyStatementAdditionalInformation
+        externalID: ""
+        dataType: varchar(50)
+        definition: "Dodatkowe informacje do oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.DODINFORM
+            isGoldenSource: true
+      - name: PartyStatementAnswer
+        externalID: ""
+        dataType: boolean
+        definition: "Wartość oświadczenia T/N"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.WARTOSW
+            isGoldenSource: true
+      - name: PartyStatementId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDOSW
+            isGoldenSource: true
+      - name: PartyStatementJounralUserCode
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Użytkownik dokonujący zmiany w dzienniku oświadczeń"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.UZYTZM
+            isGoldenSource: true
+      - name: PartyStatementJournalChangeDate
+        externalID: ""
+        dataType: datetime
+        definition: "Data i czas zmiany w dzienniku oświadczeń"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.DATAZM
+            isGoldenSource: true
+      - name: PartyStatementJournalChangeType
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Typ zmiany w dzienniku oświadczeń (rekord dodany, rekord zaktualizowany, rekord usunięty)"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.JRCHG
+            isGoldenSource: true
+      - name: PartyStatementJournalId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator dziennika zmiany oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.JRID
+            isGoldenSource: true
+      - name: PartyStatementValidFrom
+        externalID: ""
+        dataType: date
+        definition: "Oświadczenie ważne od"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.WAZNEOD
+            isGoldenSource: true
+      - name: PartyStatementValidTo
+        externalID: ""
+        dataType: date
+        definition: "Oświadczenie ważne do"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.WAZNEDO
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyStatementSource
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartyStatementSourceActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy typ źródła oświadczenia jest aktywny/aktualny "
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR362PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartyStatementSource
+        externalID: ""
+        dataType: varchar(50)
+        definition: "Opis źródła zgody"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR362PF.OPISZRODL
+            isGoldenSource: true
+      - name: PartyStatementSourceId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu źródła dla oświadczenia."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR362PF.IDOSWZRODL
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDOSWZRODL
+            isGoldenSource: true
+  - subjectArea: MIS.!!! Repozytorium systemu.MISDWH (MIS DataWarehouse).LDM Logiczny model danych.CD.Party&amp;Role
+    name: PartyStatementType
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartyStatementTypeActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy typ oświadczenia jest aktywny/aktualny"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFAFILE.PLFR360PF.AKTYWNY
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR359PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartyStatementGroupType
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Rodzaj oświadczenia w podziale na zgody marketingowe, BIK, etc."
+        isPII: false
+        columnType: Info
+        isBusinessKey: false
+      - name: PartyStatementType
+        externalID: ""
+        dataType: varchar(100)
+        definition: "Typ oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFAFILE.PLFR360PF.TYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR359PF.TYPOSW
+            isGoldenSource: true
+      - name: PartyStatementTypeCompanyCode
+        externalID: ""
+        dataType: varchar(20)
+        definition: "Wartość wskazująca jakiej spółki dotyczy typ oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+      - name: PartyStatementTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFAFILE.PLFR360PF.IDTYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR359PF.IDTYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.MDEFLFILE.PLFR393PF.IDTYPOSW
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_26 - Provision.Forberance leasing.LDM2DV.MIS.Forberance
+    name: PartyTaxIdentificationNumber
+    externalID: ""
+    objectType: MISDWH_Object
+    deployedToProd: false
+    columns:
+      - name: FK_PartyId
+        externalID: ""
+        dataType: numeric(24,0)
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASEFA.MDEFAFILE.PLFM129PF Forberance.NIPNUM
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM79PF.NIPNUM
+          - mappingID: ""
+            source: DataSources.ASEFL.MDEFLFILE.PLFM76PF.NIPNUM
+      - name: PartyTaxIdentificationNumber
+        externalID: ""
+        dataType: varchar(15)
+        definition: "Numer Identyfikacji Podatnika dla kontrahentów. Numer NIP występuje zarówno dla firm jak i osób prywatnych."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASEFA.MDEFAFILE.PLFM119PF ekspozycja, DPD i DEF_OVER.NIPNUM
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM03APF.NIPNUM
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM67PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM69PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM76PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASEFL.EFLFILE.PLFM79PF.NIPNUM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.REF_DATA.REF_DATA.CapitalGroupMember_REF.TaxIdentificationNumber
+          - mappingID: ""
+            source: DataSources.REF_DATA.REF_DATA.CustomerCentralRegister.TaxIdentificationNumber
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.RISK_RM.riskmargin.ValuableParty.ValuableTaxIdentificationNumber
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_6.2 - Sales - Party&amp;Role - CustomerCategory.LDM.MIS.Sales - CustomerCategory.CD.CustomerCategory
+    name: PartySegmentJournal
+    externalID: ""
+    objectType: MISDWH_Context
+    deployedToProd: true
+    columns:
+      - name: FK_ADLogin
+        externalID: ""
+        dataType: varchar
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.UZYTZM
+            isGoldenSource: true
+      - name: FK_PartyId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.IDPODM
+            isGoldenSource: true
+      - name: FK_PartySegmentTypeId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.IDTYPSEKA
+            isGoldenSource: true
+      - name: FK_PartySegmentTypeValueCode
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.IDWARSEG
+            isGoldenSource: true
+      - name: PartySegmentChangeDate
+        externalID: ""
+        dataType: datetime
+        definition: ""
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.DATAZM
+            isGoldenSource: true
+      - name: PartySegmentId
+        externalID: ""
+        dataType: numeric(9,0)
+        definition: "Identyfikator dziennika segmentów kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.IDSEGM
+            isGoldenSource: true
+      - name: PartySegmentJournalId
+        externalID: ""
+        dataType: numeric(24,0)
+        definition: "Numer JournalID"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.JRID
+            isGoldenSource: true
+      - name: PartySegmentValidFrom
+        externalID: ""
+        dataType: datetime
+        definition: "Data i czas zmiany wartości segmentu kontrahenta."
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR411APF.DATAZM
+            isGoldenSource: true
+      - name: PartySegmentValidTo
+        externalID: ""
+        dataType: datetime
+        definition: "Data i czas zmiany kategorii klienta"
+        isPII: false
+        columnType: Info
+        isBusinessKey: false
+  - subjectArea: MIS.MIS_6.5 - Sales - Party&amp;Role - PartyStatement.FRD.MIS.PartyStatement.FRD.MIS.Sales.Party - PartyStatement
+    name: PartyStatementGroupType
+    externalID: ""
+    objectType: MISDWH_Auxiliary
+    deployedToProd: false
+    columns:
+      - name: PartyStatementGroupType
+        externalID: ""
+        dataType: varchar(50)
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+      - name: PartyStatementTypeId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR359PF.IDTYPOSW
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR360PF.IDTYPOSW
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_6.5 - Sales - Party&amp;Role - PartyStatement.FRD.MIS.PartyStatement.FRD.MIS.Sales.Party - PartyStatement
+    name: PartyStatementJournal
+    externalID: ""
+    objectType: MISDWH_Auxiliary
+    deployedToProd: false
+    columns:
+      - name: PartyId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.IDPODM
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR435PF.IDPODM
+            isGoldenSource: true
+      - name: PartyStatementId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator oświadczenia"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+      - name: PartyStatementJounralUserCode
+        externalID: ""
+        dataType: varchar(10)
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR435PF.UZYTZM
+            isGoldenSource: true
+      - name: PartyStatementJournalChangeDate
+        externalID: ""
+        dataType: datetime
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR435PF.DATAZM
+            isGoldenSource: true
+      - name: PartyStatementJournalId
+        externalID: ""
+        dataType: int
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR409APF.JRID
+            isGoldenSource: true
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR435PF.JRID
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_6.6 - Sales - Party&amp;Role -  PartyParameter.LDM.Sales - Party&amp;Role - PartyParameter.CD.Party&amp;Role
+    name: PartyRoleParameter
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: IsPartyRoleParameterActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy parametr jest aktywny"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR325PF.AKTYWNY
+            isGoldenSource: true
+      - name: IsPartyRoleParameterModifiable
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy parametr dostępny do zmian"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR325PF.MODYF
+            isGoldenSource: true
+      - name: PartyRoleParameterId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu znacznika"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR325PF.IDTYPZNACZ
+            isGoldenSource: true
+      - name: PartyRoleParameterName
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Nazwa typu znacznika"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR325PF.TYPZNACZ
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_6.6 - Sales - Party&amp;Role -  PartyParameter.LDM.Sales - Party&amp;Role - PartyParameter.CD.Party&amp;Role
+    name: PartyRoleParameterListValue
+    externalID: ""
+    objectType: MISDWH_Dictionary
+    deployedToProd: true
+    columns:
+      - name: FK_PartyRoleParameterId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu znacznika"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR324PF.IDTYPZNACZ
+            isGoldenSource: true
+      - name: IsPartyRoleParameterActive
+        externalID: ""
+        dataType: boolean
+        definition: "Znacznik czy parametr jest aktywny"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR324PF.AKTYWNY
+            isGoldenSource: true
+      - name: PartyRoleParameterValue
+        externalID: ""
+        dataType: varchar(19)
+        definition: "Wartość parametru kontrahenta"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR324PF.IDWARZNACZ
+            isGoldenSource: true
+      - name: PartyRoleParameterValueDescription
+        externalID: ""
+        dataType: varchar(100)
+        definition: "Opis wartości słownikowej parametru"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR324PF.WARZNACZ
+            isGoldenSource: true
+  - subjectArea: MIS.MIS_6.6 - Sales - Party&amp;Role -  PartyParameter.LDM.Sales - Party&amp;Role - PartyParameter.CD.Party&amp;Role
+    name: PartyRoleParameterValue
+    externalID: ""
+    objectType: MISDWH_Link
+    deployedToProd: true
+    columns:
+      - name: FK_PartyId
+        externalID: ""
+        dataType: int
+        definition: "Indywidualny kod kontrahenta nadany w systemie"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDPODM
+            isGoldenSource: true
+      - name: FK_PartyRoleParameterId
+        externalID: ""
+        dataType: int
+        definition: "Identyfikator typu znacznika"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDTYPZNACZ
+            isGoldenSource: true
+      - name: FK_PartyRoleParameterValue
+        externalID: ""
+        dataType: varchar(10)
+        definition: "Wartość parametru kontrahenta"
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: false
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDWARZNACZ
+            isGoldenSource: true
+      - name: FK_RoleId
+        externalID: ""
+        dataType: int
+        definition: "Id roli kontrahenta pośród dostępnych typów roli, jak Dostawca, Dostawca kosztowy, Klient leasingowy, Klient inny itp."
+        isPII: false
+        columnType: ForeignKey
+        isBusinessKey: true
+        sourceMappings:
+          - mappingID: ""
+            source: DataSources.ASCOM.EFLFILE.PLFR416PF.IDROL
+            isGoldenSource: true
+      - name: PartyRoleParameterName
+        externalID: ""
+        dataType: varchar(35)
+        definition: "Nazwa typu znacznika"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+      - name: PartyRoleParameterValue
+        externalID: ""
+        dataType: varchar(19)
+        definition: "Wartość parametru kontrahenta"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+      - name: PartyRoleParameterValueDescription
+        externalID: ""
+        dataType: varchar(100)
+        definition: "Opis wartości słownikowej parametru"
+        isPII: false
+        columnType: DescriptiveAttribute
+        isBusinessKey: false
+
+requirements:
+  - name: "$$$FR.DWH.Dostawca.0000 Zasilenie encji Supplier danymi z [WBK]"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-04
+    modifiedDate: 2023-01-11
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleType.RoleType
+  - name: "$$$FR.DWH.Kontrahent.0000 Zasilenie encji Customer danymi z [WBK]"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-04
+    modifiedDate: 2024-08-05
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleType.RoleTypeId
+  - name: "FR.DWH.AnonimProd.0003 [ALL] Anonimizacja danych - RODO"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-06-15
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.DecTrans.0004 [ASEFA, ASEFL] Powiązanie Party z transactionscoring.SupplierData"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-04-21
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.TaxIdentificationNumber
+  - name: "FR.DWH.Dostawca.0003 [ASEFA, ASEFL] Powiązanie Contract z Party (w roli Supplier)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-18
+    modifiedDate: 2025-10-22
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Dostawca.0004 [LFO] Powiązanie Offer z Party (w roli Supplier)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-04
+    modifiedDate: 2025-10-26
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.PartyRole.RoleId
+  - name: "FR.DWH.Dostawca.0005 [PS] Powiązanie Offer z Party (w roli Supplier)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-11
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.GenerRaport.0041 JDPipeline - Kryterium doboru ofert / umów"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2025-04-01
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.TaxIdentificationNumber
+  - name: "FR.DWH.Kontrahent.0000 Party"
+    externalID: ""
+    type: FR
+    author: Renata Jaracz
+    createdDate: 2023-06-02
+    modifiedDate: 2023-06-02
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0021 [ASEFA, ASEFL] Powiązanie Party z ClientData "
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-04-12
+    modifiedDate: 2023-09-12
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+      - LogicalObjects.Party.TaxIdentificationNumber
+  - name: "FR.DWH.Kontrahent.0025 [ASEFA, ASEFL] Powiązanie Contract z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-18
+    modifiedDate: 2024-08-05
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0028 [ASEFL i ASEFA] Party - PartyName"
+    externalID: ""
+    type: FR
+    author: Renata Jaracz
+    createdDate: 2022-06-23
+    modifiedDate: 2024-08-05
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyName
+  - name: "FR.DWH.Kontrahent.0055 [ASEFA, ASEFL] SupplierSegment"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-07-14
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.PartySegmentType
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0056 [ASEFA, ASEFL] Połączenie Party oraz KYSProcessDecision"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-02-05
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0057 [ASEFA, ASEFL] Połączenie Party oraz ScoringSupplierData"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-02-05
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0064 [INFO_SALES] Połączenie Party z Interfejsami"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-02-02
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0072 [ASEFA, ASEFL] PartySegmentJournal - PartySegmentValidTo"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-07-20
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartySegmentJournal.PartySegmentValidTo
+  - name: "FR.DWH.Kontrahent.0073 [LFO] Powiązanie Offer z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-11
+    modifiedDate: 2025-10-26
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+      - LogicalObjects.Party.PartyGUID
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.Kontrahent.0074 [PS] Powiązanie Offer z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-11
+    modifiedDate: 2025-10-26
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0077 [ASEFA, ASEFL] CustomerCategory"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-07-07
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartySegmentType
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0078 [ASEFA, ASEFL] CustomerCategoryJournal"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-07-07
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartySegmentJournal
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0082 [ASEFA, ASEFL] CustomerSegment"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-06-02
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartySegmentType
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0083 [ASEFA, ASEFL] CustomerSegmentJournal"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-07-12
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartySegmentJournal
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0087 [ASEFL, ASEFA] Party.IsOnSanctionsList"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-03-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.IsOnSanctionsList
+  - name: "FR.DWH.Kontrahent.0112 [REF_DATA] PartyStatementGroupType"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-19
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartyStatementType
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0113 [ASEFA, ASEFL] PartyStatementJournal"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-25
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartyStatementJournal
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0114 [ASEFL, ASEFA] PartyStatement - IsLastAvailablePartyStatement"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-15
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyStatement.IsLastAvailablePartyStatement
+      - LogicalObjects.PartyStatement.PartyId
+      - LogicalObjects.PartyStatement.PartyStatementId
+      - LogicalObjects.PartyStatement.PartyStatementJournalChangeDate
+  - name: "FR.DWH.Kontrahent.0115 [ASEFL, ASEFA] PartyStatementType - PartyStatementTypeCompanyCode"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyStatementType.PartyStatementTypeCompanyCode
+  - name: "FR.DWH.Kontrahent.0116 [ASEFL, ASEFA] PartyStatementType - PartyStatementTypeId"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyStatementType.PartyStatementTypeId
+  - name: "FR.DWH.Kontrahent.0117 [REF_DATA] PartyStatementType - PartyStatementGroupType"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-09-15
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyStatementType.PartyStatementGroupType
+  - name: "FR.DWH.Kontrahent.0118 [ASEFL, ASEFA] PartyRoleParameter"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-06-20
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.PartyRoleParameter
+      - LogicalObjects.PartyRoleParameterListValue
+      - LogicalObjects.PartyRoleParameterValue
+    appliedToColumns:
+  - name: "FR.DWH.Kontrahent.0126 [All] Party - Połączenie z innymi encjami po TaxIdentifiactionNumber"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.TaxIdentificationNumber
+  - name: "FR.DWH.Kontrahent.0128 [ASEFA, ASEFL] Party - PartyId_SameAs - FIRMID-&gt;IDPODM (do wyliczenia)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0129 [ASEFA, ASEFL] Party - PartyId_SameAs - GUID-&gt;IDPODM"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyGUID
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.Kontrahent.0130 [ASEFA, ASEFL] Party - PartyId_SameAs - IDPODM-&gt;IDPODM"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0132 [LFO] Party - PartyId_SameAs - Dostawca"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0133 [LFO] Party - PartyId_SameAs - Id-&gt;IDPODM - wyliczenie"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0134 [LFO] Party - PartyId_SameAs - Id-GUID"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0135 [PS] Party - PartyId_SameAs - BO_ID-&gt;GUID"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0136 [PS] Party - PartyId_SameAs - BO_ID-&gt;IDPODM - wyliczenie"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-23
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId_SameAs
+  - name: "FR.DWH.Kontrahent.0137 [All] Party - TaxIdentificationNumber_2_PartyID.PartyID_Customer"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2025-02-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleType.RoleTypeId
+  - name: "FR.DWH.Kontrahent.0138 [All] Party - TaxIdentificationNumber_2_PartyID.PartyID_CustomerPartyID_Guarantor"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2025-02-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleType.RoleTypeId
+  - name: "FR.DWH.Kontrahent.0139 [All] Party - TaxIdentificationNumber_2_PartyID.PartyID_CustomerPartyID_Supplier"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2025-02-06
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleType.RoleTypeId
+  - name: "FR.DWH.Lead.0001 CrmIssue - powiązanie CrmIssue z Party"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-09-05
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyGUID
+      - LogicalObjects.PartyRoleType.RoleTypeId
+  - name: "FR.DWH.Lead.0023 LeadTimeToOffer.IsContractCreated"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-11-21
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.Lead.0041 CRMIssueDetail.IsCRMIssueContract"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-09-28
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Lead.0042 CRMIssueDetail.IsCrmIssueOffer"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-09-28
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.Lead.0043 CRMIssueDetail.IsCRMIssueOfferRepresentative"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2023-10-02
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Lead.0048 Połączenie CRMIssueTaskResult z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-17
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.ProdUbezp.0007 [ASEFA] - InsuranceCompany - połączenie z Party"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-06-18
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.RapUmowa.0272 powiązanie aneksu z party ContractAnnex.PartyID_Customer"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-06-14
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.PartyRole.PartyId
+  - name: "FR.DWH.RezStat.0001 powiązanie NIP z Party "
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-07-17
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.PartyTaxIdentificationNumber.PartyId
+  - name: "FR.DWH.RezStat.0002 powiązanie DefaultCustomer z Party "
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-06-18
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.RezStat.0003 powiązanie DefaultReason z Party "
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-06-15
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+  - name: "FR.DWH.RezStat.0004 powiązanie PDGroup z party Party"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-12-18
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRole.PartyId
+  - name: "FR.DWH.RezStat.0006 powiązanie StatisticaProvisionCustomerPortfolio z party StatisticalProvisionCustomerPortfolio.PartyID_Customer"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-06-18
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.PartyId
+      - LogicalObjects.PartyRole.PartyId
+  - name: "FR.DWH.Sprawa.0012 [PS] Case - Połączenie z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-04-04
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "FR.DWH.Sprawa.0013 [PS] Opportunity - Połączenie z Party (w roli Customer)"
+    externalID: ""
+    type: FR
+    author: Marta Skrętkowicz
+    createdDate: 2024-04-05
+    modifiedDate: 2025-10-24
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:
+  - name: "NFR.DWH.Ogólne.0003 [ASEFL, ASEFA, ASCOM] Formatowanie pól liczbowych na datę"
+    externalID: ""
+    type: FR
+    author: Renata Jaracz
+    createdDate: 2022-10-27
+    modifiedDate: 2024-06-14
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartySegmentJournal.PartySegmentValidFrom
+  - name: "NFR.DWH.Ogólne.0004 [ALL] Formatowanie pól Is... o typie boolean"
+    externalID: ""
+    type: FR
+    author: Renata Jaracz
+    createdDate: 2022-09-08
+    modifiedDate: 2023-04-12
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.IsOnSanctionsList
+      - LogicalObjects.Party.ResidentOfPL
+      - LogicalObjects.Party.WhetherBankruptcy
+      - LogicalObjects.PartyLegalForm.IsPartyTypeOfLegalFormActive
+      - LogicalObjects.PartyRoleType.IsRoleActive
+  - name: "NFR.DWH.Ogólne.0012 [ASEFL, ASEFA] Niezmapowany atrybut"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2023-01-24
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.Party.ResidentOfPL
+      - LogicalObjects.Party.WhetherBankruptcy
+  - name: "NFR.DWH.Ogólne.0013 [All] - Wart 0 na null"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-06-24
+    modifiedDate: 2025-10-27
+    appliedToObjects:
+    appliedToColumns:
+      - LogicalObjects.PartyRoleParameterValue.RoleId
+  - name: "NFR.DWH.Seku.0003 [INFO_SECURITISATION] SnapshotDate = CalendarEoM"
+    externalID: ""
+    type: FR
+    author: Łukasz Wolski
+    createdDate: 2024-07-03
+    modifiedDate: 2024-12-27
+    appliedToObjects:
+      - LogicalObjects.Party
+    appliedToColumns:

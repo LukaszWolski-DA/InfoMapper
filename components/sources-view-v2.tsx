@@ -5,7 +5,7 @@ import type { SourcesDomainData, SourceObject } from "@/lib/source-types"
 import { SourcesTree } from "./sources-tree"
 import { SourcesDetails } from "./sources-details"
 import { SourcesIssues } from "./sources-issues"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DraggableDialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { z } from "zod"
 import { getSourcesTreePrefs, setSourcesTreePrefs } from "@/lib/ui-prefs"
 import { ImButton } from "./ui/im-button"
@@ -207,9 +207,9 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
                   Import from file
                 </ImButton>
               </DialogTrigger>
-              <DialogContent>
+              <DraggableDialogContent className="w-[480px]" overlayClassName="bg-transparent">
                 <DialogHeader>
-                  <DialogTitle>Import from file</DialogTitle>
+                  <DialogTitle className="dialog-drag-handle cursor-move">Import from file</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 text-sm">
                   <p>Wybierz plik JSON przygotowany wg schematu z dokumentu „Sources – instrukcja i szablony importu".</p>
@@ -221,7 +221,7 @@ export function SourcesViewV2({ data, onDataUpdated }: SourcesViewV2Props) {
                     <input ref={fileInputRef} type="file" accept=".json,application/json" className="hidden" onChange={handleFileSelected} />
                   </div>
                 </div>
-              </DialogContent>
+              </DraggableDialogContent>
             </Dialog>
           </div>
           

@@ -27,18 +27,28 @@ export function SourcesTree({
   const [filterOnlyTables, setFilterOnlyTables] = useState(false)
   const [filterOnlyViews, setFilterOnlyViews] = useState(false)
   const [filterOnlyIssues, setFilterOnlyIssues] = useState(false)
-  const [openSystemIds, setOpenSystemIds] = useState<Set<string>>(new Set())
-  const [openDatabaseIds, setOpenDatabaseIds] = useState<Set<string>>(new Set())
-  const [openSchemaIds, setOpenSchemaIds] = useState<Set<string>>(new Set())
-  const [openObjectIds, setOpenObjectIds] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
+  // Lazy initialization with localStorage persistence (matching Object tree pattern)
+  const [openSystemIds, setOpenSystemIds] = useState<Set<string>>(() => {
     const prefs = getSourcesTreePrefs()
-    setOpenSystemIds(new Set(prefs.openSystemIds || []))
-    setOpenDatabaseIds(new Set(prefs.openDatabaseIds || []))
-    setOpenSchemaIds(new Set(prefs.openSchemaIds || []))
-    setOpenObjectIds(new Set(prefs.openObjectIds || []))
-  }, [])
+    if (prefs.openSystemIds) {
+      return new Set<string>(prefs.openSystemIds)
+    }
+    // Default: open first system if available
+    return new Set<string>(data.systems[0] ? [data.systems[0].id] : [])
+  })
+  const [openDatabaseIds, setOpenDatabaseIds] = useState<Set<string>>(() => {
+    const prefs = getSourcesTreePrefs()
+    return new Set<string>(prefs.openDatabaseIds || [])
+  })
+  const [openSchemaIds, setOpenSchemaIds] = useState<Set<string>>(() => {
+    const prefs = getSourcesTreePrefs()
+    return new Set<string>(prefs.openSchemaIds || [])
+  })
+  const [openObjectIds, setOpenObjectIds] = useState<Set<string>>(() => {
+    const prefs = getSourcesTreePrefs()
+    return new Set<string>(prefs.openObjectIds || [])
+  })
 
   useEffect(() => {
     setSourcesTreePrefs({

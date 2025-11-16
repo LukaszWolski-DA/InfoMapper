@@ -19,9 +19,11 @@ export interface Source {
 export interface Requirement {
   id: string
   name: string
-  description: string
-  priority: string
-  status: string
+  description?: string
+  type?: "Functional" | "Non-functional" | "Other"
+  displayId: number
+  priority?: string
+  status?: string
 }
 
 export interface Attribute {

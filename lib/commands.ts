@@ -1,4 +1,4 @@
-import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig } from "./types"
+import type { Concept, LogicalAttribute, LogicalEntity, DiagramItem, Connection, Relationship, EntityStereotypeConfig, SourceColumnTagConfig, Requirement } from "./types"
 import { genConceptId, genLogicalAttributeId, genLogicalEntityId, genRequirementId, genConnectionId, genRelationshipId } from "./id"
 import { getObjectState, setObjectState } from "./store"
 
@@ -117,29 +117,24 @@ export function upsertCardAttribute(
 }
 
 // =============================
-// Requirements (UI row) Commands
+// Requirements Commands
 // =============================
-type RequirementRow = {
-  id: string
-  name: string
-  description?: string
-  type?: "Functional" | "Non-functional" | "Other"
-  displayId: number
-}
 
-export function addRequirement(name: string, type: RequirementRow["type"] = "Functional", description?: string): RequirementRow {
-  const row: RequirementRow = {
+export function addRequirement(name: string, type: Requirement["type"] = "Functional", description?: string): Requirement {
+  const requirement: Requirement = {
     id: genRequirementId(),
     name: name.trim(),
     description: (description ?? "").trim(),
     type,
     displayId: Math.floor(100000 + Math.random() * 900000),
+    priority: "Medium",
+    status: "Proposed",
   }
-  setObjectState((prev) => ({ ...prev, requirements: [row, ...prev.requirements] }))
-  return row
+  setObjectState((prev) => ({ ...prev, requirements: [requirement, ...prev.requirements] }))
+  return requirement
 }
 
-export function updateRequirement(id: string, updates: Partial<RequirementRow>): void {
+export function updateRequirement(id: string, updates: Partial<Requirement>): void {
   setObjectState((prev) => ({
     ...prev,
     requirements: prev.requirements.map((r) => (r.id === id ? { ...r, ...updates } : r)),

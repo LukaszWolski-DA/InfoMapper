@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { ModelObjectTree } from "./model-object-tree"
 import { ModelDiagramArea } from "./model-diagram-area"
 import type { DiagramItem, Entity, Relationship, Attribute, LogicalEntity, LogicalAttribute, Concept } from "@/lib/types"
@@ -11,6 +11,7 @@ import { objectFilterSchema } from "@/lib/filter/schemas"
 import { useFilteredEntities } from "@/hooks/use-filtered-entities"
 import { normalizeStereotype } from "@/lib/utils"
 import { useSettings } from "@/lib/use-settings"
+import { Dialog, DraggableDialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 
 interface ModelViewV2Props {
   entities: Entity[]
@@ -84,7 +85,8 @@ export function ModelViewV2({
 
   // Use custom hook to filter entities based on filtered attributes
   const filteredEntities = useFilteredEntities(entities, filteredAttributes, logicalAttributesRaw.length)
-  const allEntities = filteredEntities
+  // Memoize allEntities to prevent unnecessary remounting of ModelObjectTree
+  const allEntities = useMemo(() => filteredEntities, [filteredEntities])
 
   // Funkcje callback do obsługi relationship (bez eventów)
   const handleUpdateRelationshipLabel = (id: string, label: string) => {
@@ -221,8 +223,6 @@ export function ModelViewV2({
             logicalEntities={logicalEntitiesRaw}
             entities={allEntities}
             diagramItems={diagramItems}
-            searchQuery=""
-            onSearchChange={() => {}}
             onAddCustom={onAddCustomEntity}
             isLeftPanelVisible={isLeftPanelVisible}
             onToggleLeftPanelVisible={setIsLeftPanelVisible}
@@ -342,11 +342,18 @@ export function ModelViewV2({
         </div>
       </main>
 
-      {showRelationshipForm && pendingRelationship && (
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-[480px]">
-              <h3 className="text-lg font-semibold mb-4">{editingRelationshipId ? "Edit Relationship" : "Create Relationship"}</h3>
+      <Dialog open={showRelationshipForm && !!pendingRelationship} onOpenChange={(open) => {
+        if (!open) handleCancelRelationship()
+      }}>
+        <DraggableDialogContent className="w-[480px]" overlayClassName="bg-transparent">
+          <DialogHeader>
+            <DialogTitle className="dialog-drag-handle cursor-move">
+              {editingRelationshipId ? "Edit Relationship" : "Create Relationship"}
+            </DialogTitle>
+          </DialogHeader>
 
+          {pendingRelationship && (
+            <>
               <div className="mb-4 text-sm text-gray-600 space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
@@ -459,9 +466,10 @@ export function ModelViewV2({
                   </ImButton>
                 )}
               </div>
-            </div>
-          </div>
-        )}
+            </>
+          )}
+        </DraggableDialogContent>
+      </Dialog>
     </div>
   )
 }

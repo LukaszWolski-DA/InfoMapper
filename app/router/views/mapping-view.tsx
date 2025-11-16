@@ -39,6 +39,9 @@ interface MappingViewProps {
 
   // Item updates
   onUpdateObjectType: (itemId: string, objectType: string) => void
+
+  // Requirement edit modal
+  onOpenRequirementEdit: (requirement: Requirement | null) => void
 }
 
 // ============================
@@ -117,6 +120,7 @@ export function MappingView(props: MappingViewProps) {
       onAddCustomSource={props.onAddCustomSource}
       onAddCustomRequirement={props.onAddCustomRequirement}
       onUpdateObjectType={props.onUpdateObjectType}
+      onOpenRequirementEdit={props.onOpenRequirementEdit}
     />
   )
 }

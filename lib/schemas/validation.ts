@@ -98,6 +98,7 @@ export const LogicalAttributeSchema = z.object({
   name: z.string().min(1),
   dataType: z.string().optional(),
   isPrimaryKey: z.boolean().optional(),
+  isForeignKey: z.boolean().optional(),
   isNullable: z.boolean().optional(),
   isPII: z.boolean().optional(),
   description: z.string().optional(),
@@ -106,17 +107,19 @@ export const LogicalAttributeSchema = z.object({
 export type LogicalAttribute = z.infer<typeof LogicalAttributeSchema>
 
 /**
- * Schema for requirement rows in the requirements view.
+ * Schema for requirements in the application.
  * Requirements can be functional, non-functional, or other types.
  */
-export const RequirementRowSchema = z.object({
+export const RequirementSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
   type: z.enum(["Functional", "Non-functional", "Other"]).optional(),
   displayId: z.number(),
+  priority: z.string().optional(),
+  status: z.string().optional(),
 })
-export type RequirementRow = z.infer<typeof RequirementRowSchema>
+export type Requirement = z.infer<typeof RequirementSchema>
 
 /**
  * Schema for the complete persisted application state.
@@ -131,7 +134,7 @@ export const PersistedStateSchema = z.object({
   concepts: z.array(ConceptSchema).optional().default([]),
   logicalEntities: z.array(LogicalEntitySchema).optional().default([]),
   logicalAttributes: z.array(LogicalAttributeSchema).optional().default([]),
-  requirements: z.array(RequirementRowSchema).optional().default([]),
+  requirements: z.array(RequirementSchema).optional().default([]),
 })
 export type PersistedState = z.infer<typeof PersistedStateSchema>
 

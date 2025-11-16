@@ -25,7 +25,10 @@ export function projectEntities(params: {
         id: a.id,
         name: a.name,
         nameEn: a.name,
-        stereotype: a.isPrimaryKey ? "PK" : a.isForeignKey ? "FK" : "Attribute",
+        stereotype: a.isPrimaryKey && a.isForeignKey ? "PK+FK"
+          : a.isPrimaryKey ? "PK"
+          : a.isForeignKey ? "FK"
+          : "Attribute",
         isPrimaryKey: a.isPrimaryKey,
         isForeignKey: a.isForeignKey,
         isPII: a.isPII,
@@ -55,7 +58,10 @@ export function projectEntityAttributes(
       id: a.id,
       name: a.name,
       nameEn: a.name,
-      stereotype: a.isPrimaryKey ? "PK" : a.isForeignKey ? "FK" : "Attribute",
+      stereotype: a.isPrimaryKey && a.isForeignKey ? "PK+FK"
+        : a.isPrimaryKey ? "PK"
+        : a.isForeignKey ? "FK"
+        : "Attribute",
       isPrimaryKey: a.isPrimaryKey,
       isForeignKey: a.isForeignKey,
       isPII: a.isPII,
@@ -78,23 +84,21 @@ export function projectMapping(params: {
   logicalAttributes: LogicalAttribute[]
   diagramItems: DiagramItem[]
   connections: Connection[]
-  requirements: any[] // RequirementRow z store
+  requirements: Requirement[]
   externalSources?: Source[] // Opcjonalnie: źródła z zewnętrznego importu
 }): MappingProjection {
   const { diagramItems, connections, requirements, externalSources = [] } = params
-  
+
   // Encje z projekcji modelu logicznego
   const entities = projectEntities(params)
-  
-  // Requirements przekształcone do UI shape
-  const requirementsUI: Requirement[] = requirements.map((r: any) => ({
-    id: r.id,
-    name: r.name,
-    description: r.description || "",
-    priority: "Medium",
-    status: "Proposed",
+
+  // Requirements - already in correct format, just ensure defaults
+  const requirementsUI: Requirement[] = requirements.map((r) => ({
+    ...r,
+    priority: r.priority || "Medium",
+    status: r.status || "Proposed",
   }))
-  
+
   return {
     entities,
     sources: externalSources, // Sources pochodzą z zewnętrznego importu

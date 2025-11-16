@@ -7,6 +7,7 @@ import { SourcesTree } from "./sources-tree"
 import { ImButton } from "./ui/im-button"
 import { ImInput } from "./ui/im-input"
 import { ImSelect } from "./ui/im-select"
+import { getMappingSidebarPrefs, setMappingSidebarPrefs } from "@/lib/ui-prefs"
 import type { DiagramItem, Entity, Source, Requirement, Concept, LogicalEntity, LogicalAttribute } from "@/lib/types"
 import type { SourcesDomainData } from "@/lib/source-types"
 
@@ -64,18 +65,37 @@ export function Sidebar({
   const allSources = sources ?? customSources
   const allRequirements = requirements ?? customRequirements
 
-  // State for sidebar width with resizing
-  const [sidebarWidth, setSidebarWidth] = useState(340)
+  // State for sidebar width with resizing - initialize from localStorage
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const prefs = getMappingSidebarPrefs()
+    return prefs.sidebarWidth || 340
+  })
 
-  // State for ObjectTree expand/collapse
-  const [openConceptIds, setOpenConceptIds] = useState<Set<string>>(new Set())
-  const [openEntityIds, setOpenEntityIds] = useState<Set<string>>(new Set())
+  // State for ObjectTree expand/collapse - initialize from localStorage
+  const [openConceptIds, setOpenConceptIds] = useState<Set<string>>(() => {
+    const prefs = getMappingSidebarPrefs()
+    return new Set(prefs.openConceptIds || [])
+  })
+
+  const [openEntityIds, setOpenEntityIds] = useState<Set<string>>(() => {
+    const prefs = getMappingSidebarPrefs()
+    return new Set(prefs.openEntityIds || [])
+  })
 
   // State for Add forms
   const [showAddEntity, setShowAddEntity] = useState(false)
   const [newEntityName, setNewEntityName] = useState("")
   const [newEntityType, setNewEntityType] = useState("Object")
   const [newEntityConcept, setNewEntityConcept] = useState("")
+
+  // Persist sidebar state to localStorage
+  useEffect(() => {
+    setMappingSidebarPrefs({
+      sidebarWidth,
+      openConceptIds: Array.from(openConceptIds),
+      openEntityIds: Array.from(openEntityIds),
+    })
+  }, [sidebarWidth, openConceptIds, openEntityIds])
 
   const handleToggleConcept = (id: string) => {
     setOpenConceptIds(prev => {

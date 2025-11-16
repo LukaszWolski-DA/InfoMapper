@@ -58,6 +58,7 @@ interface MappingViewV2Props {
   onAddCustomEntityWithConcept?: (conceptId: string, name: string, objectType?: string) => void
   onAddCustomSource: (name: string, database?: string) => void
   onAddCustomRequirement: (name: string, reqType: string) => void
+  onOpenRequirementEdit: (requirement: Requirement | null) => void
 
   // DependencyPanel props
   selectedAttribute: {
@@ -125,6 +126,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
     onAddCustomEntityWithConcept,
     onAddCustomSource,
     onAddCustomRequirement,
+    onOpenRequirementEdit,
     // DependencyPanel props
     selectedAttribute,
     onSelectAttribute,
@@ -179,6 +181,7 @@ export const MappingViewV2 = memo(function MappingViewV2(props: MappingViewV2Pro
           entities={projectedEntities}
           customSources={importedSources}
           customRequirements={requirementsForUi}
+          onOpenRequirementEdit={onOpenRequirementEdit}
         />
       </main>
 

@@ -85,6 +85,19 @@ interface ViewRouterProps {
   // Requirements view
   connections: Connection[]
 
+  // Requirement edit modal (shared between Requirements and Mapping views)
+  requirementEditModal: {
+    isOpen: boolean
+    editingId: string | null
+    formName: string
+    formDesc: string
+    formType: "Functional" | "Non-functional" | "Other"
+  }
+  onRequirementEditModalChange: (modal: ViewRouterProps['requirementEditModal']) => void
+  onOpenRequirementEdit: (requirement: Requirement | null) => void
+  onCloseRequirementEdit: () => void
+  onSaveRequirementEdit: () => void
+
   // Mapping view (fully managed by hooks internally)
   importedSources: Source[]
   requirementsForUi: Requirement[]
@@ -133,6 +146,8 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
           onAddCustomRequirement={props.onAddCustomRequirement}
           // Item updates
           onUpdateObjectType={props.updateItemObjectType}
+          // Requirement edit modal
+          onOpenRequirementEdit={props.onOpenRequirementEdit}
         />
       )
 
@@ -198,6 +213,11 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
           logicalAttributes={props.logicalAttributes}
           logicalEntities={props.logicalEntities}
           concepts={props.concepts}
+          requirementEditModal={props.requirementEditModal}
+          onRequirementEditModalChange={props.onRequirementEditModalChange}
+          onOpenRequirementEdit={props.onOpenRequirementEdit}
+          onCloseRequirementEdit={props.onCloseRequirementEdit}
+          onSaveRequirementEdit={props.onSaveRequirementEdit}
         />
       )
 

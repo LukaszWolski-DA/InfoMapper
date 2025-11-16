@@ -1,26 +1,32 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import type { Concept, DiagramItem, Entity, LogicalEntity } from "@/lib/types"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ImInput } from "@/components/ui/im-input"
 import { ImButton } from "@/components/ui/im-button"
 import { TreeItem } from "./tree-item"
+import { getModelTreePrefs, setModelTreePrefs } from "@/lib/ui-prefs"
 
 interface ModelObjectTreeProps {
   concepts: Concept[]
   logicalEntities: LogicalEntity[]
   entities: Entity[]
   diagramItems: DiagramItem[]
-  searchQuery: string
-  onSearchChange: (q: string) => void
+  searchQuery?: string
+  onSearchChange?: (q: string) => void
   onAddCustom: (name: string, objectType?: string) => void
   isLeftPanelVisible?: boolean
   onToggleLeftPanelVisible?: (v: boolean) => void
 }
 
-export function ModelObjectTree({ concepts, logicalEntities, entities, diagramItems, searchQuery, onSearchChange, onAddCustom, isLeftPanelVisible, onToggleLeftPanelVisible }: ModelObjectTreeProps) {
-  const byConcept = useMemo(() => {
+export function ModelObjectTree({ concepts, logicalEntities, entities, diagramItems, searchQuery: externalSearchQuery, onSearchChange: externalOnSearchChange, onAddCustom, isLeftPanelVisible, onToggleLeftPanelVisible }: ModelObjectTreeProps) {
+  // Use internal state for search if not controlled externally
+  const [internalSearchQuery, setInternalSearchQuery] = useState("")
+  const searchQuery = externalSearchQuery ?? internalSearchQuery
+  const onSearchChange = externalOnSearchChange ?? setInternalSearchQuery
+  // Build concept-to-entities map inline (no memoization to avoid reactive dependencies)
+  const byConcept = (() => {
     const map = new Map<string, Entity[]>()
     for (const c of concepts) map.set(c.id, [])
     // match logical->entity by id
@@ -32,22 +38,55 @@ export function ModelObjectTree({ concepts, logicalEntities, entities, diagramIt
       map.set(le.conceptId, list)
     }
     return map
-  }, [concepts, logicalEntities, entities])
-  const [openConceptIds, setOpenConceptIds] = useState<Set<string>>(() => new Set<string>(concepts[0] ? [concepts[0].id] : []))
+  })()
+
+  // Lazy initialization with localStorage persistence - ONLY from localStorage, no fallback
+  const [openConceptIds, setOpenConceptIds] = useState<Set<string>>(() => {
+    const prefs = getModelTreePrefs()
+    return prefs.openConceptIds
+      ? new Set<string>(prefs.openConceptIds)
+      : new Set<string>()  // Empty set, default will be set by useEffect if needed
+  })
+
   const [filterHasPk, setFilterHasPk] = useState(false)
   const [filterHasPii, setFilterHasPii] = useState(false)
   const [filterOnlyIssues, setFilterOnlyIssues] = useState(false)
+
+  // Set default expansion ONLY on true first visit (when localStorage is empty)
   useEffect(() => {
-    if (openConceptIds.size === 0 && concepts[0]) setOpenConceptIds(new Set([concepts[0].id]))
-  }, [concepts])
+    const prefs = getModelTreePrefs()
+    // Only set default if: localStorage is empty AND state is empty AND we have concepts
+    if (!prefs.openConceptIds && openConceptIds.size === 0 && concepts.length > 0) {
+      setOpenConceptIds(new Set([concepts[0].id]))
+    }
+  }, []) // Empty deps - run only once on mount
+
+  // Persist expansion state to localStorage
+  useEffect(() => {
+    setModelTreePrefs({
+      openConceptIds: Array.from(openConceptIds),
+    })
+  }, [openConceptIds])
 
   // Auto-expand concepts on search (like ObjectTree)
   useEffect(() => {
     if (!searchQuery) return
     const lower = searchQuery.toLowerCase()
     const matching = new Set<string>()
+
+    // Build fresh byConcept map for search (snapshot at search time)
+    const searchByConcept = new Map<string, Entity[]>()
+    for (const c of concepts) searchByConcept.set(c.id, [])
+    for (const le of logicalEntities) {
+      const ent = entities.find((e) => e.id === le.id)
+      if (!ent) continue
+      const list = searchByConcept.get(le.conceptId) || []
+      list.push(ent)
+      searchByConcept.set(le.conceptId, list)
+    }
+
     for (const c of concepts) {
-      const ents = byConcept.get(c.id) || []
+      const ents = searchByConcept.get(c.id) || []
       const conceptMatches = c.name.toLowerCase().includes(lower)
       let entityOrAttrMatch = false
       for (const e of ents) {
@@ -62,7 +101,7 @@ export function ModelObjectTree({ concepts, logicalEntities, entities, diagramIt
     if (matching.size > 0) {
       setOpenConceptIds((prev) => new Set<string>([...prev, ...matching]))
     }
-  }, [searchQuery, concepts, byConcept])
+  }, [searchQuery])
 
   const addAlphaToHex = (hex: string, alphaHex: string = "26") => {
     if (typeof hex !== "string") return hex

@@ -14,6 +14,7 @@ import { projectEntities, projectMapping, projectModel } from "@/lib/projections
 import { SourcesViewV2 } from "@/components/sources-view-v2"
 import { CatalogView } from "@/components/catalog-view"
 import { RequirementsViewV2 } from "@/components/requirements-view-v2"
+import { RequirementEditModal } from "@/components/requirement-edit-modal"
 import type { DiagramItem, Connection, Attribute, Entity, Source, Requirement, Relationship, Concept, LogicalEntity, LogicalAttribute } from "@/lib/types"
 import { z } from "zod"
 import * as Schemas from "@/lib/schemas/validation"
@@ -28,8 +29,9 @@ import {
   deleteEntity as cmdDeleteEntity, 
   updateAttribute as cmdUpdateAttribute, 
   updateConcept as cmdUpdateConcept, 
-  updateEntity as cmdUpdateEntity, 
-  addRequirement as cmdAddRequirement, 
+  updateEntity as cmdUpdateEntity,
+  addRequirement as cmdAddRequirement,
+  updateRequirement as cmdUpdateRequirement,
   upsertCardAttribute,
   // Mapping commands
   addDiagramItem as cmdAddDiagramItem,
@@ -94,15 +96,28 @@ export default function InfoMapperPage() {
   const [importedSources, setImportedSources] = useState<Source[]>([])
   const [sourcesRawData, setSourcesRawData] = useState<SourcesDomainData>({ systems: [], databases: [], schemas: [], objects: [] })
   // Requirements from store (single source of truth)
-  const [storeRequirements, setStoreRequirements] = useState<{ id: string; name: string }[]>(getObjectState().requirements as any)
-  // Mapped list for UI (Requirement shape)
-  const requirementsForUi: Requirement[] = (storeRequirements as any[]).map((r: any) => ({
-    id: r.id,
-    name: r.name,
-    description: r.description || "",
-    priority: "Medium",
-    status: "Proposed",
+  const [storeRequirements, setStoreRequirements] = useState<Requirement[]>(getObjectState().requirements)
+  // Requirements are already in correct format, just ensure defaults
+  const requirementsForUi: Requirement[] = storeRequirements.map((r) => ({
+    ...r,
+    priority: r.priority || "Medium",
+    status: r.status || "Proposed",
   }))
+
+  // Requirement edit modal state (shared between RequirementsView and DiagramCard)
+  const [requirementEditModal, setRequirementEditModal] = useState<{
+    isOpen: boolean
+    editingId: string | null
+    formName: string
+    formDesc: string
+    formType: "Functional" | "Non-functional" | "Other"
+  }>({
+    isOpen: false,
+    editingId: null,
+    formName: "",
+    formDesc: "",
+    formType: "Functional",
+  })
 
   // Autosave indicator
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
@@ -402,6 +417,56 @@ export default function InfoMapperPage() {
     // Store automatycznie persystuje do localStorage i notyfikuje subskrybentów
   }
 
+  // Requirement edit modal handlers
+  const openRequirementEdit = (requirement: Requirement | null) => {
+    if (requirement) {
+      setRequirementEditModal({
+        isOpen: true,
+        editingId: requirement.id,
+        formName: requirement.name,
+        formDesc: requirement.description || "",
+        formType: requirement.type || "Functional",
+      })
+    } else {
+      // Create new requirement
+      setRequirementEditModal({
+        isOpen: true,
+        editingId: null,
+        formName: "",
+        formDesc: "",
+        formType: "Functional",
+      })
+    }
+  }
+
+  const closeRequirementEdit = () => {
+    setRequirementEditModal({
+      isOpen: false,
+      editingId: null,
+      formName: "",
+      formDesc: "",
+      formType: "Functional",
+    })
+  }
+
+  const saveRequirementEdit = () => {
+    const name = requirementEditModal.formName.trim()
+    if (!name) return
+
+    if (requirementEditModal.editingId) {
+      // Update existing requirement
+      cmdUpdateRequirement(requirementEditModal.editingId, {
+        name,
+        description: requirementEditModal.formDesc,
+        type: requirementEditModal.formType,
+      })
+    } else {
+      // Create new requirement
+      cmdAddRequirement(name, requirementEditModal.formType, requirementEditModal.formDesc)
+    }
+    closeRequirementEdit()
+  }
+
   const addModelItem = (item: DiagramItem) => cmdAddModelItem(item)
 
   const hideModelItem = (itemId: string) => cmdHideModelItem(itemId)
@@ -660,6 +725,12 @@ export default function InfoMapperPage() {
           deleteModelAttribute={deleteModelAttribute}
           // Requirements view
           connections={getObjectState().connections}
+          // Requirement edit modal (shared between Requirements and Mapping views)
+          requirementEditModal={requirementEditModal}
+          onRequirementEditModalChange={setRequirementEditModal}
+          onOpenRequirementEdit={openRequirementEdit}
+          onCloseRequirementEdit={closeRequirementEdit}
+          onSaveRequirementEdit={saveRequirementEdit}
           // Mapping view (fully managed by hooks internally)
           importedSources={importedSources}
           requirementsForUi={requirementsForUi}
@@ -671,6 +742,18 @@ export default function InfoMapperPage() {
           onAddCustomRequirement={addCustomRequirement}
         />
       </div>
+
+      {/* Globalny modal edycji wymagania */}
+      <RequirementEditModal
+        isOpen={requirementEditModal.isOpen}
+        editingId={requirementEditModal.editingId}
+        formName={requirementEditModal.formName}
+        formDesc={requirementEditModal.formDesc}
+        formType={requirementEditModal.formType}
+        onModalChange={setRequirementEditModal}
+        onClose={closeRequirementEdit}
+        onSave={saveRequirementEdit}
+      />
     </div>
   )
 }

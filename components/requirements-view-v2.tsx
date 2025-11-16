@@ -1,55 +1,66 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { addRequirement, deleteRequirement, updateRequirement } from "@/lib/commands"
+import { deleteRequirement } from "@/lib/commands"
 import { getObjectState, subscribe } from "@/lib/store"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ImInput } from "@/components/ui/im-input"
-import { ImSelect } from "@/components/ui/im-select"
+import { Dialog, DraggableDialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ImButton } from "@/components/ui/im-button"
 import { IntelligentFilter } from "@/components/ui/intelligent-filter"
 import { requirementsFilterSchema, objectFilterSchema } from "@/lib/filter/schemas"
-import type { Connection, LogicalAttribute, LogicalEntity, Concept } from "@/lib/types"
-import MDEditor from '@uiw/react-md-editor'
+import { getRequirementsViewPrefs, setRequirementsViewPrefs } from "@/lib/ui-prefs"
+import type { Connection, LogicalAttribute, LogicalEntity, Concept, Requirement } from "@/lib/types"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-
-interface RequirementRow {
-  id: string
-  name: string
-  description?: string
-  type?: "Functional" | "Non-functional" | "Other"
-  displayId: number
-}
 
 interface RequirementsViewV2Props {
   connections?: Connection[]
   logicalAttributes?: LogicalAttribute[]
   logicalEntities?: LogicalEntity[]
   concepts?: Concept[]
+  // Requirement edit modal (shared state)
+  requirementEditModal: {
+    isOpen: boolean
+    editingId: string | null
+    formName: string
+    formDesc: string
+    formType: "Functional" | "Non-functional" | "Other"
+  }
+  onRequirementEditModalChange: (modal: RequirementsViewV2Props['requirementEditModal']) => void
+  onOpenRequirementEdit: (requirement: Requirement | null) => void
+  onCloseRequirementEdit: () => void
+  onSaveRequirementEdit: () => void
 }
 
 export function RequirementsViewV2({
   connections = [],
   logicalAttributes = [],
   logicalEntities = [],
-  concepts = []
+  concepts = [],
+  requirementEditModal,
+  onRequirementEditModalChange,
+  onOpenRequirementEdit,
+  onCloseRequirementEdit,
+  onSaveRequirementEdit,
 }: RequirementsViewV2Props) {
-  const [items, setItems] = useState<RequirementRow[]>(getObjectState().requirements as any)
-  
+  const [items, setItems] = useState<Requirement[]>(getObjectState().requirements)
+
   // Step 1: Filter by requirements criteria
-  const [filteredByRequirements, setFilteredByRequirements] = useState<RequirementRow[]>(items)
-  
+  const [filteredByRequirements, setFilteredByRequirements] = useState<Requirement[]>(items)
+
   // Step 2: Filter by entity/attribute criteria
   const [filteredByEntity, setFilteredByEntity] = useState<LogicalAttribute[]>(logicalAttributes)
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [formName, setFormName] = useState("")
-  const [formDesc, setFormDesc] = useState("")
-  const [formType, setFormType] = useState<"Functional" | "Non-functional" | "Other">("Functional")
   const [viewDescId, setViewDescId] = useState<string | null>(null)
-  const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(true)
-  const [isEntityFilterVisible, setIsEntityFilterVisible] = useState(false) // Domyślnie ukryty
+
+  // Filter panel visibility states - initialize from localStorage
+  const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(() => {
+    const prefs = getRequirementsViewPrefs()
+    return prefs.isFilterPanelVisible ?? true
+  })
+
+  const [isEntityFilterVisible, setIsEntityFilterVisible] = useState(() => {
+    const prefs = getRequirementsViewPrefs()
+    return prefs.isEntityFilterVisible ?? false
+  })
 
   // Helper: Get requirement IDs that are mapped to filtered entities/attributes
   const requirementsMappedToEntities = useMemo(() => {
@@ -124,7 +135,7 @@ export function RequirementsViewV2({
   // Subskrybuj store
   useEffect(() => {
     const unsub = subscribe(() => {
-      const reqs = (getObjectState().requirements as any) || []
+      const reqs = getObjectState().requirements || []
       setItems(reqs)
       setFilteredByRequirements(reqs)
     })
@@ -136,32 +147,13 @@ export function RequirementsViewV2({
     setFilteredByEntity(logicalAttributes)
   }, [logicalAttributes])
 
-  const openCreate = () => {
-    setEditingId(null)
-    setFormName("")
-    setFormDesc("")
-    setFormType("Functional")
-    setIsFormOpen(true)
-  }
-
-  const openEdit = (row: RequirementRow) => {
-    setEditingId(row.id)
-    setFormName(row.name)
-    setFormDesc(row.description || "")
-    setFormType(row.type || "Functional")
-    setIsFormOpen(true)
-  }
-
-  const saveForm = () => {
-    const name = formName.trim()
-    if (!name) return
-    if (editingId) {
-      updateRequirement(editingId, { name, description: formDesc, type: formType })
-    } else {
-      addRequirement(name, formType, formDesc)
-    }
-    setIsFormOpen(false)
-  }
+  // Persist filter panel visibility to localStorage
+  useEffect(() => {
+    setRequirementsViewPrefs({
+      isFilterPanelVisible,
+      isEntityFilterVisible,
+    })
+  }, [isFilterPanelVisible, isEntityFilterVisible])
 
   const removeRequirement = (id: string) => {
     deleteRequirement(id)
@@ -257,7 +249,7 @@ export function RequirementsViewV2({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <ImButton variant="primary" onClick={openCreate}>Add Requirement</ImButton>
+              <ImButton variant="primary" onClick={() => onOpenRequirementEdit(null)}>Add Requirement</ImButton>
             </div>
           </div>
         </div>
@@ -274,41 +266,7 @@ export function RequirementsViewV2({
         </div>
       )}
 
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Requirement" : "Add Requirement"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Requirement Name</div>
-              <ImInput value={formName} onChange={(e) => setFormName(e.target.value)} />
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Requirement Description (Markdown supported)</div>
-              <MDEditor
-                value={formDesc}
-                onChange={(val) => setFormDesc(val || "")}
-                preview="edit"
-                height={250}
-                data-color-mode="light"
-              />
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Requirement Type</div>
-              <ImSelect value={formType} onChange={(e) => setFormType(e.target.value as any)}>
-                <option value="Functional">Functional</option>
-                <option value="Non-functional">Non-functional</option>
-                <option value="Other">Other</option>
-              </ImSelect>
-            </div>
-            <div className="flex gap-2 pt-2">
-              <ImButton onClick={saveForm} variant="success">Save</ImButton>
-              <ImButton onClick={() => setIsFormOpen(false)} variant="neutral">Cancel</ImButton>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Modal is now rendered globally in page.tsx */}
 
       {/* Table area - scrollable */}
       <div className="flex-1 overflow-auto p-4">
@@ -351,16 +309,16 @@ export function RequirementsViewV2({
                     >
                       View
                     </button>
-                    <DialogContent>
+                    <DraggableDialogContent className="w-[600px]" overlayClassName="bg-transparent">
                       <DialogHeader>
-                        <DialogTitle>Requirement Description</DialogTitle>
+                        <DialogTitle className="dialog-drag-handle cursor-move">Requirement Description</DialogTitle>
                       </DialogHeader>
                       <div className="text-sm text-gray-700 prose prose-sm max-w-none">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {r.description || "(no description)"}
                         </ReactMarkdown>
                       </div>
-                    </DialogContent>
+                    </DraggableDialogContent>
                   </Dialog>
                 </td>
                 <td className="im-td">
@@ -372,7 +330,7 @@ export function RequirementsViewV2({
                 </td>
                 <td className="im-td">
                   <div className="flex gap-1 justify-end">
-                    <ImButton variant="neutral" onClick={() => openEdit(r)}>Edit</ImButton>
+                    <ImButton variant="neutral" onClick={() => onOpenRequirementEdit(r)}>Edit</ImButton>
                     <ImButton
                       variant="danger"
                       onClick={() => {

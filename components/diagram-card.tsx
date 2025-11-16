@@ -41,6 +41,7 @@ interface DiagramCardProps {
   allRequirements: Requirement[]
   mode?: "mapping" | "model"
   zoom?: number
+  onOpenRequirementEdit?: (requirement: Requirement | null) => void
 }
 
 const MIN_WIDTH = 200
@@ -70,6 +71,7 @@ export const DiagramCard = memo(function DiagramCard({
   allRequirements,
   mode = "mapping",
   zoom = 1,
+  onOpenRequirementEdit,
 }: DiagramCardProps) {
   const settings = useSettings()
   const cardRef = useRef<HTMLDivElement>(null)
@@ -200,6 +202,11 @@ export const DiagramCard = memo(function DiagramCard({
   }
 
   const getItemDisplayName = (d: Entity | Source | Requirement): string => {
+    // For requirements, format as [displayId] name
+    if ("displayId" in d && typeof d.displayId === "number") {
+      return `[${d.displayId}] ${d.name}`
+    }
+    // For entities and sources
     return ("name" in d ? d.name : (d as Source).table) || ""
   }
 
@@ -548,6 +555,12 @@ export const DiagramCard = memo(function DiagramCard({
     allRequirements,
   ])
 
+  // Helper function to truncate text
+  const truncateText = (text: string, maxLength: number): string => {
+    if (!text) return ""
+    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text
+  }
+
   const displaySubtitle = () => {
     if (isEntity) {
       if (isEditingType) {
@@ -587,13 +600,41 @@ export const DiagramCard = memo(function DiagramCard({
       )
     }
 
+    // For sources and requirements
+    if (data && ("database" in data)) {
+      // Source: database.schema
+      return (
+        <div className="text-xs text-gray-600">
+          {`${(data as any).database}.${(data as any).schema}`}
+        </div>
+      )
+    }
+
+    // For requirements: truncated description with double-click to edit
+    if (isRequirement && data) {
+      const description = (data as any)?.description || ""
+      return (
+        <div
+          className="text-xs text-gray-600 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors"
+          onDoubleClick={(e) => {
+            e.stopPropagation()
+            if (onOpenRequirementEdit) {
+              onOpenRequirementEdit(data as Requirement)
+            }
+          }}
+          title="Double-click to view/edit full description"
+        >
+          {truncateText(description, 200)}
+        </div>
+      )
+    }
+
+    // Fallback (shouldn't happen but for safety)
     return (
       <div className="text-xs text-gray-600">
         {data && ("stereotype" in data)
           ? getStereotypeLabel((data as any).stereotype, settings?.entityStereotypes)
-          : data && ("database" in data)
-            ? `${(data as any).database}.${(data as any).schema}`
-            : (data as any)?.description}
+          : (data as any)?.description || ""}
       </div>
     )
   }
@@ -642,10 +683,10 @@ export const DiagramCard = memo(function DiagramCard({
       }
     } else {
       // For entities, update via store
+      // Note: stereotype is computed in projection layer from boolean flags, don't send it
       const updates: Partial<Attribute> = {
         name: editAttrName.trim(),
         nameEn: editAttrName.trim(),
-        stereotype: editIsPrimaryKey ? "PK" : editIsForeignKey ? "FK" : "Attribute",
         isPrimaryKey: editIsPrimaryKey,
         isForeignKey: editIsForeignKey,
         isPII: editIsPII,
@@ -675,11 +716,11 @@ export const DiagramCard = memo(function DiagramCard({
     if (!newAttrName.trim()) return
 
     const generatedId = genLogicalAttributeId()
+    // Note: stereotype is computed in projection layer from boolean flags, don't send it
     const newAttribute: Attribute = {
       id: generatedId,
       name: newAttrName.trim(),
       nameEn: newAttrName.trim(),
-      stereotype: isPrimaryKey ? "PK" : isForeignKey ? "FK" : "Attribute",
       isPrimaryKey: isPrimaryKey,
       isForeignKey: isForeignKey,
       isPII: isPII,
@@ -891,15 +932,24 @@ export const DiagramCard = memo(function DiagramCard({
 
                     {/* Conditional rendering based on item type */}
                     {item.itemType === "source" ? (
-                      // Source tags checkboxes
+                      // Source tags checkboxes - flex wrap layout
                       <div className="mb-3">
                         <div className="text-xs text-gray-600 mb-2">Tags:</div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-wrap gap-2">
                           {(["BusinessKey", "LinkBusinessKey", "ChildKey", "DictionaryKey", "DictionaryChildKey", "PIIAttribute"] as SourceColumnTag[]).map(tag => {
                             const { label, color } = getSourceColumnTagBadge(tag, settings.sourceColumnTags)
                             const isSelected = editTags.includes(tag)
+                            const tagDescription = settings.sourceColumnTags.find(t => t.id === tag)?.description || tag
                             return (
-                              <label key={tag} className="flex items-center text-xs cursor-pointer" title={tag}>
+                              <label
+                                key={tag}
+                                className={`flex items-center text-xs cursor-pointer px-2 py-1.5 rounded border transition-all ${
+                                  isSelected
+                                    ? color + ' ring-2 ring-offset-1 ring-current'
+                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-100'
+                                }`}
+                                title={tagDescription}
+                              >
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
@@ -912,9 +962,7 @@ export const DiagramCard = memo(function DiagramCard({
                                   }}
                                   className="mr-1.5"
                                 />
-                                <span className={`px-1.5 py-0.5 rounded border ${isSelected ? color : 'bg-gray-50 text-gray-400 border-gray-200'}`}>
-                                  {label}
-                                </span>
+                                <span className="font-medium">{label}</span>
                               </label>
                             )
                           })}
