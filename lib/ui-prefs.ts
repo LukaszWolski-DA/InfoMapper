@@ -38,12 +38,32 @@ export type RequirementsViewPrefs = {
   isEntityFilterVisible?: boolean
 }
 
+export type DocumentationViewPrefs = {
+  isLeftPanelVisible?: boolean
+  leftPanelWidth?: number
+  selectedConcepts?: string[]
+  selectedEntities?: string[]
+  selectedRequirements?: string[]
+  openConceptIds?: string[]
+  sections?: {
+    executiveSummary?: boolean
+    entityDefinitions?: boolean
+    attributes?: boolean
+    sourceMappings?: boolean
+    relationships?: boolean
+    requirements?: boolean
+    diagrams?: boolean
+  }
+  format?: 'markdown' | 'html'
+}
+
 type UIPrefs = {
   objectTree?: ObjectTreePrefs
   modelTree?: ModelTreePrefs
   sourcesTree?: SourcesTreePrefs
   mappingSidebar?: MappingSidebarPrefs
   requirementsView?: RequirementsViewPrefs
+  documentationView?: DocumentationViewPrefs
 }
 
 export function getUIPrefs(): UIPrefs {
@@ -137,6 +157,18 @@ export function setRequirementsViewPrefs(prefs: Partial<RequirementsViewPrefs>):
   setUIPrefs({
     ...existing,
     requirementsView: { ...existing.requirementsView, ...prefs },
+  })
+}
+
+export function getDocumentationViewPrefs(): DocumentationViewPrefs {
+  return getUIPrefs().documentationView || {}
+}
+
+export function setDocumentationViewPrefs(prefs: Partial<DocumentationViewPrefs>): void {
+  const existing = getUIPrefs()
+  setUIPrefs({
+    ...existing,
+    documentationView: { ...existing.documentationView, ...prefs },
   })
 }
 

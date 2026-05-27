@@ -466,7 +466,9 @@ export const DiagramCard = memo(function DiagramCard({
       if (!cardRef.current) return
 
       const cardRect = cardRef.current.getBoundingClientRect()
-      const cardHeight = cardRect.height
+      // Convert SCALED DOM height to UNSCALED world coordinates
+      // This ensures collapsed cards report their actual height
+      const cardHeight = cardRect.height / zoom
       const handles: import("@/lib/types").HandlePosition[] = []
 
       if (allAttributes.length > 0 && !item.collapsed) {
@@ -480,17 +482,20 @@ export const DiagramCard = memo(function DiagramCard({
 
           if (attrElement) {
             // DOM-based measurement (most accurate)
+            // IMPORTANT: getBoundingClientRect() returns SCALED coordinates (affected by CSS transform)
+            // We must divide by zoom to convert back to UNSCALED world coordinates
             const attrRect = attrElement.getBoundingClientRect()
-            const relativeY = attrRect.top - cardRect.top + (attrRect.height / 2)
+            const relativeY = (attrRect.top - cardRect.top) / zoom + (attrRect.height / zoom / 2)
             const absoluteY = item.top + relativeY
 
             // Use actual attribute box dimensions from DOM for precise anchor positioning
             // This accounts for varying card widths and attribute content
-            const attrRelativeLeft = attrRect.left - cardRect.left
-            const attrRelativeRight = attrRect.right - cardRect.left
+            // Convert SCALED DOM measurements to UNSCALED world coordinates
+            const attrRelativeLeft = (attrRect.left - cardRect.left) / zoom
+            const attrRelativeRight = (attrRect.right - cardRect.left) / zoom
 
-            const leftHandleX = item.left + attrRelativeLeft // Left edge of actual attribute box
-            const rightHandleX = item.left + attrRelativeRight // Right edge of actual attribute box
+            const leftHandleX = item.left + attrRelativeLeft // Left edge of actual attribute box (unscaled)
+            const rightHandleX = item.left + attrRelativeRight // Right edge of actual attribute box (unscaled)
 
             handles.push(
               {
@@ -549,6 +554,7 @@ export const DiagramCard = memo(function DiagramCard({
     item.collapsed,
     item.attributeFilter,
     item.itemType,
+    zoom, // IMPORTANT: Recalculate handles when zoom changes
     onUpdateHandles,
     allEntities,
     allSources,

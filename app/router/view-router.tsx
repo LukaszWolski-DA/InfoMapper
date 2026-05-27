@@ -5,6 +5,7 @@ import { ObjectViewV2 } from '@/components/object-view-v2'
 import { SourcesViewV2 } from '@/components/sources-view-v2'
 import { RequirementsViewV2 } from '@/components/requirements-view-v2'
 import { CatalogView } from '@/components/catalog-view'
+import { DocumentationView } from '@/components/documentation-view'
 import { InstructionsView } from '@/components/instructions-view'
 import { SettingsView } from '@/components/settings-view'
 import type {
@@ -36,6 +37,7 @@ export type ViewType =
   | 'sources'
   | 'requirements'
   | 'catalog'
+  | 'documentation'
   | 'instructions'
   | 'settings'
 
@@ -223,6 +225,19 @@ export const ViewRouter = memo(function ViewRouter(props: ViewRouterProps) {
 
     case 'catalog':
       return <CatalogView />
+
+    case 'documentation':
+      return (
+        <DocumentationView
+          concepts={props.concepts}
+          logicalEntities={props.logicalEntities}
+          logicalAttributes={props.logicalAttributes}
+          requirements={props.requirementsForUi}
+          connections={props.connections}
+          modelRelationships={props.modelRelationships}
+          modelItems={props.modelDiagramItems}
+        />
+      )
 
     case 'instructions':
       return <InstructionsView />

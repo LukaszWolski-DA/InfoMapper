@@ -15,6 +15,7 @@ interface TopNavProps {
     { id: "requirements", label: "Requirements" },
     { id: "mapping", label: "Mapping" },
     { id: "catalog", label: "Catalog" },
+    { id: "documentation", label: "Documentation" },
     { id: "settings", label: "Settings" },
   ]
 
